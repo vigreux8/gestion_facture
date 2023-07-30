@@ -1,7 +1,7 @@
 import os
 import PyPDF2
 import re
-from Setting.CONSTANTE import FOLDER
+from Setting.CONSTANTE import FOLDER_LOCAL
 # from Setting.CONSTANTE import FOLDER
 
 
@@ -62,7 +62,7 @@ class facture():
                 nom_fichier = self.separateur.join([self.provenance,date,id,nom_produit,prix_ttc])
                 # print(prix_total_TTC)
                 print(nom_fichier)
-                patch_new = os.path.join(FOLDER.AMAZON,f"{nom_fichier}.pdf")
+                patch_new = os.path.join(FOLDER_LOCAL.AMAZON,f"{nom_fichier}.pdf")
                 print("liens_1",path_old)
                 print("liens_2",patch_new)
                 os.rename(path_old,patch_new)
@@ -70,7 +70,7 @@ class facture():
 class facture_amazon_produit():
     def __init__(self) -> None:
         self.factures_folder = []
-        self.folder = FOLDER.AMAZON
+        self.folder = FOLDER_LOCAL.AMAZON
         self.provenance = "amazon"
         self.separateur = "_"
         self.infos_factures = []
@@ -167,7 +167,7 @@ class facture_amazon_produit():
                 nom_fichier = self.separateur.join([self.provenance,date,id,nom_produit,prix_ttc])
                 # print(prix_total_TTC)
                 print(nom_fichier)
-                patch_new = os.path.join(FOLDER.AMAZON,f"{nom_fichier}.pdf")
+                patch_new = os.path.join(FOLDER_LOCAL.AMAZON,f"{nom_fichier}.pdf")
                 print("liens_1",path_old)
                 print("liens_2",patch_new)
                 os.rename(path_old,patch_new)
@@ -175,7 +175,7 @@ class facture_amazon_produit():
 class facture_amazon_prime():
     def __init__(self) -> None:
         self.factures_folder = []
-        self.folder = FOLDER.AMAZON_PRIME
+        self.folder = FOLDER_LOCAL.AMAZON_PRIME
         self.provenance = "amazon"
         self.separateur = "_"
         self.infos_factures = []
@@ -270,7 +270,7 @@ class facture_amazon_prime():
                 nom_fichier = self.separateur.join([self.provenance,date,id,nom_produit,prix_ttc])
                 # print(prix_total_TTC)
                 print(nom_fichier)
-                patch_new = os.path.join(FOLDER.AMAZON,f"{nom_fichier}.pdf")
+                patch_new = os.path.join(FOLDER_LOCAL.AMAZON,f"{nom_fichier}.pdf")
                 print("liens_1",path_old)
                 print("liens_2",patch_new)
                 os.rename(path_old,patch_new)

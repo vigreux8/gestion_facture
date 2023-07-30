@@ -1,11 +1,11 @@
 import os
 
-class FOLDER():
+class FOLDER_LOCAL():
     DOSSIER_FACTURE = "facture"
     AMAZON = os.path.join(".",DOSSIER_FACTURE,"amazon")
     AMAZON_PRIME = os.path.join(".",DOSSIER_FACTURE,"amazon_prime")
     FACTURE_PAS_TRAITER = os.path.join(".",DOSSIER_FACTURE,"pas traiter")
-    FACTURE_TRAITER = os.path.join(".",DOSSIER_FACTURE,"traiter")
+    FACTURE_ARCHIVER = os.path.join(".",DOSSIER_FACTURE,"archiver")
     
 
 class GOOGLE_AUTH():
@@ -14,11 +14,11 @@ class GOOGLE_AUTH():
     KEY_AUTH_OAUTH = os.path.join(DOSSIER,"client_secrets.json")
     TOKEN_REFRESH = os.path.join(DOSSIER,"token_refresh.json")
     
-class GOOGLESHEET():
+class FOLDER_GOOGLESHEET():
     SHEET_OPEN = "test script python"
     FACTURE = "facture_obh_test" 
     
     
-class GOOGLEDRIVE():
-    ID_DOSSIER_FACTURE_TRAITER = "1y27_FsNR0PRaxNz564CI27L_jK1sZnFp"
+class FOLDER_GOOGLEDRIVE():
+    ID_DOSSIER_FACTURE_ARCHIVER = "1y27_FsNR0PRaxNz564CI27L_jK1sZnFp"
     ID_DOSSIER_FACTURE_INCONNUE = "1xrYm-Wo_8jpvbfo3srmdMdsds1mptfXL"

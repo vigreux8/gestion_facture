@@ -1,9 +1,9 @@
 import gspread
-from  Setting.CONSTANTE import GOOGLE_AUTH,GOOGLESHEET
+from  Setting.CONSTANTE import GOOGLE_AUTH,FOLDER_GOOGLESHEET
 
 
 compte = gspread.service_account(GOOGLE_AUTH.KEY_MAILS_AUTH)
-document_spreeshit =  compte.open(GOOGLESHEET.SHEET_OPEN)
+document_spreeshit =  compte.open(FOLDER_GOOGLESHEET.SHEET_OPEN)
 feuille1 = document_spreeshit.worksheet("Feuille1")
 correspondance_index_to_letter = {
     1:"a",
