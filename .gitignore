@@ -1,0 +1,8 @@
+.env
+amazon_prime
+amazon
+test_google_apy.py
+credentials.json
+client_secrets.json
+service_account.json
+token_refresh.json
