@@ -12,9 +12,9 @@ import sqlite3
 
 class MrLocal:
     def __init__(self) -> None:
-        self.list_factures_non_traiter = self.extract_site_id_path_from_files(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
-        self.list_factures_archiver = self.extract_site_id_path_from_files(FOLDER_LOCAL.FACTURE_ARCHIVER)
-        self.list_factures_inconnue = self.extract_site_id_path_from_files(FOLDER_LOCAL.FACTURE_INCONNUE)
+        self.list_factures_non_traiter = self.set_data_file(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
+        self.list_factures_archiver = self.set_data_file(FOLDER_LOCAL.FACTURE_ARCHIVER)
+        self.list_factures_inconnue = self.set_data_file(FOLDER_LOCAL.FACTURE_INCONNUE)
         self.list_all_list_facture = []
         self.rassembler_toute_les_facture()
         self.facture_info_test = ({
@@ -25,9 +25,9 @@ class MrLocal:
             "provenance" : "amazon"
         })
     def refresh(self):
-        self.list_factures_non_traiter = self.extract_site_id_path_from_files(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
-        self.list_factures_archiver = self.extract_site_id_path_from_files(FOLDER_LOCAL.FACTURE_ARCHIVER)
-        self.list_factures_inconnue = self.extract_site_id_path_from_files(FOLDER_LOCAL.FACTURE_INCONNUE)
+        self.list_factures_non_traiter = self.set_data_file(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
+        self.list_factures_archiver = self.set_data_file(FOLDER_LOCAL.FACTURE_ARCHIVER)
+        self.list_factures_inconnue = self.set_data_file(FOLDER_LOCAL.FACTURE_INCONNUE)
         self.rassembler_toute_les_facture()
         
         
@@ -47,16 +47,18 @@ class MrLocal:
 
 
     @staticmethod
-    def extract_site_id_path_from_files(patch_dossier = FOLDER_LOCAL.FACTURE_PAS_TRAITER):
+    def set_data_file(patch_dossier = FOLDER_LOCAL.FACTURE_PAS_TRAITER):
         #recupere tout les fichiers formater en separant le site d'origine et l'id du fichier
         all_facture_id_name_chem = []
         for nom_fichier in os.listdir(patch_dossier):
             if os.path.isfile(os.path.join(patch_dossier, nom_fichier)):
+                #lie le pdf
                 id_facture = nom_fichier.split("_")[1].split(".")[0]
                 all_facture_id_name_chem.append({
                     "id":id_facture,
                     "name":nom_fichier,
-                    "path" : os.path.join(patch_dossier,nom_fichier)})
+                    "path" : os.path.join(patch_dossier,nom_fichier)}),
+                    
                 
         return all_facture_id_name_chem
 
@@ -78,6 +80,7 @@ class MrDrive:
         self.list_factures_en_cours = self.get_all_file_drive_folder(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_EN_COURS)
         self.list_all_facture = []
         self.rassembler_toute_les_facture()
+    
     def refresh(self):
         self.list_archiver = self.get_all_file_drive_folder(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_ARCHIVER)
         self.list_factures_inconnue = self.get_all_file_drive_folder(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_INCONNUE)
@@ -90,10 +93,12 @@ class MrDrive:
         file_liste = self.drive.ListFile({'q': f"'{id_folder}' in parents and trashed=false"}).GetList()
         if file_liste:
             for file in file_liste:
+                id_facture = file["title"].split("_")[1].split(".")[0]
                 drive_liste.append({
                     "name":file['title'],
-                    "id":file['id'],
-                    "id_folder": id_folder,
+                    "id_facture": id_facture
+                    "google_file_id":file['id'],
+                    "google_folder_id": id_folder,
                     "url" : file['alternateLink']
                 })
             return drive_liste
@@ -169,8 +174,7 @@ class MrDrive:
         self.key_connexion = key_connecte_google_drive
         self.drive = GoogleDrive(key_connecte_google_drive)
 
-    def upload_local_to_drive(self,id_dossier_destionation = FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_ARCHIVER ):
-        for facture in self.local_list_factures_non_traiter : 
+    def upload_local_to_drive(self,id_dossier_destionation = FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_ARCHIVER,facture ):
             drive_facture_traiter = self.drive.CreateFile(
             {
             'parents': [{'id': id_dossier_destionation}],
@@ -251,36 +255,24 @@ class MrOrchestre():
     def main_constructor(self):
         # print(self.local.local_all_list_facture)
         # print(self.sheet.list_all_value_colonne_id)
-        self.grouper_info(self.local.list_all_list_facture,self.drive.list_all_facture)
-        print(self.Super_liste_facture)
+        # self.grouper_info(self.local.list_all_list_facture,self.drive.list_all_facture)
+        # print(self.Super_liste_facture)
+        for facture in self.local.list_factures_non_traiter:
+            self.drive.upload_local_to_drive(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_EN_COURS,facture)
+            self.drive.refresh()
+            self.sheet.set_last_value_incrementale
+            self.drive.list_factures_en_cours[0]
+        
+        
         pass
-    
-    
-    
-    def grouper_info(self,list_facture_local,list_dossier_drive: list):
-        # rassembler tout les donner local et drive pour tout avoir au même endroit
-        #vérifier le bon fonctionnement
-        liste_fichier_drive = list_dossier_drive 
-        index__drive = 0
-        for fichier_local in list_facture_local:
-            # print("fichier locale",fichier_local)       
-            for fichier_drive in liste_fichier_drive:
-                # print("fichier drive",fichier_drive)       
-                
-                if fichier_local["name"] == fichier_drive["name"]:
-                    # fichier_local.add(fichier_drive)
-                    fichier_local =  set(fichier_drive+fichier_local)
-                    if list_facture_local is list:
-                        liste_fichier_drive.remove(index__drive)
-                self.Super_liste_facture.append(fichier_local)
-                index__drive +=1
-            
-    def tchek_id_in_sheet(self, list_sheets):
-        for facture in self.Super_liste_facture:
-            # je comparer si il se trouve dans pas_traiter ou en_cours_drive compare
-            for facture_present in list_sheets:
-                if facture["id"] == facture_present["id"]:
-                        print("oker")
+    """crée une base donner sql pour savoir
+        -ID : id_facture
+        -name : string
+        -present_sheet : BOOl
+        -Present_drive_archiver : BOOL
+        -id_drive :
+        -patch_local :
+    """
 
 main = MrOrchestre()
 main.main_constructor()

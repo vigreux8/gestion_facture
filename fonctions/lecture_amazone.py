@@ -175,7 +175,7 @@ class facture_amazon_produit():
 class facture_amazon_prime():
     def __init__(self) -> None:
         self.factures_folder = []
-        self.folder = FOLDER_LOCAL.AMAZON_PRIME
+        self.folder = FOLDER_LOCAL.FACTURE_PAS_TRAITER
         self.provenance = "amazon"
         self.separateur = "_"
         self.infos_factures = []
@@ -254,26 +254,26 @@ class facture_amazon_prime():
             return "None"
             # print("Aucun prix trouvé.")
         
-    def set_name_fichier(self):
-        for facture in self.infos_factures: 
-                path_old = facture[1]
-                print("facture[5]zeezrzerrze",path_old)
-                nom_original = facture[2]
-                date = facture[3]
-                id = facture[4]
-                nom_produit = facture[5]
-                prix_ttc = facture[6]
-                print("date :", date)
-                print("id :", id)
-                print("nom_produit :", nom_produit)
-                print("prix_ttc :", prix_ttc)
-                nom_fichier = self.separateur.join([self.provenance,date,id,nom_produit,prix_ttc])
-                # print(prix_total_TTC)
-                print(nom_fichier)
-                patch_new = os.path.join(FOLDER_LOCAL.AMAZON,f"{nom_fichier}.pdf")
-                print("liens_1",path_old)
-                print("liens_2",patch_new)
-                os.rename(path_old,patch_new)
+    # def set_name_fichier(self):
+    #     for facture in self.infos_factures: 
+    #             path_old = facture[1]
+    #             print("facture[5]zeezrzerrze",path_old)
+    #             nom_original = facture[2]
+    #             date = facture[3]
+    #             id = facture[4]
+    #             nom_produit = facture[5]
+    #             prix_ttc = facture[6]
+    #             print("date :", date)
+    #             print("id :", id)
+    #             print("nom_produit :", nom_produit)
+    #             print("prix_ttc :", prix_ttc)
+    #             nom_fichier = self.separateur.join([self.provenance,date,id,nom_produit,prix_ttc])
+    #             # print(prix_total_TTC)
+    #             print(nom_fichier)
+    #             patch_new = os.path.join(FOLDER_LOCAL.AMAZON,f"{nom_fichier}.pdf")
+    #             print("liens_1",path_old)
+    #             print("liens_2",patch_new)
+    #             os.rename(path_old,patch_new)
  
 # Affichez les noms des fichiers
 
