@@ -6,13 +6,15 @@ class FOLDER_LOCAL():
     AMAZON_PRIME = os.path.join(".",DOSSIER_FACTURE,"amazon_prime")
     FACTURE_PAS_TRAITER = os.path.join(".",DOSSIER_FACTURE,"pas traiter")
     FACTURE_ARCHIVER = os.path.join(".",DOSSIER_FACTURE,"archiver")
+    FACTURE_INCONNUE= os.path.join(".",DOSSIER_FACTURE,"inconnue")
+    
     
 
 class GOOGLE_AUTH():
     DOSSIER ="google-api-identifiant"
     KEY_MAILS_AUTH = os.path.join(DOSSIER,"service_account.json")
     KEY_AUTH_OAUTH = os.path.join(DOSSIER,"client_secrets.json")
-    TOKEN_REFRESH = os.path.join(DOSSIER,"token_refresh.json")
+    KEY_TOKEN_REFRESH = os.path.join(DOSSIER,"token_refresh.json")
     
 class FOLDER_GOOGLESHEET():
     SHEET_OPEN = "test script python"
