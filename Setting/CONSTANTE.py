@@ -2,6 +2,7 @@ import os
 
 class FOLDER_LOCAL():
     DOSSIER_FACTURE = "facture"
+    DOSSIER_CONTENUE_PDF = "ContenuePdf"
     AMAZON = os.path.join(".",DOSSIER_FACTURE,"amazon")
     AMAZON_PRIME = os.path.join(".",DOSSIER_FACTURE,"amazon_prime")
     FACTURE_PAS_TRAITER = os.path.join(".",DOSSIER_FACTURE,"pas traiter")

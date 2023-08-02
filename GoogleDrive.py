@@ -10,160 +10,44 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import PyPDF2
 import re
-
-class facture_amazon_prime():
-    def __init__(self,path) -> None:
-        self.info_facture = []
-        self.path = path
-        self.provenance = "amazon-prime"
-        self.separateur = "_"
-        self.infos_factures = []
-        self.IDs = ""
-        self.nom_produit = ""
-        self.DATE_ACHAT  = ""
-        self.prix_ttc = ""
-        self.PATTERN_ID = r"(\D\d{2}-\d{7}-\d{7}\D)"
-        self.PATTERN_COUT_TTC = r"TTC\s(.*?)(?=\s\|)"
-        self.PATTERN_DATE =  r"\d{1,2}\s\w+\s\d{4}"
-        self.PATTERN_DATE_ALTERNATIVE = r"Date de la commande (\d{1,2}\s\w+\.\s\d{4})"
-        self.PATTERN_PRIX_TTC = r"Total à payer\s+EUR\s+(\d+\.\d{2})"
-        self.init_all_content()
-        # print(self.infos_factures[0][1:len(self.infos_factures[0])])
-        
-    def init_all_content(self):
-        """
-        récupere tout les contenue de tout les PDF
-        self.content = [contenu,chemins_fichier,nom_fichier,date,id,nom_produit,prix_ttc,]
-        """
-        binarie_file = open(self.path,"rb")
-        pdf_reader = PyPDF2.PdfReader(binarie_file)
-        first_page = pdf_reader.pages[0]
-        first_page = first_page.extract_text()
-        date = self.get_date_achat(first_page)
-        id = self.get_ID(first_page)
-        nom = self.get_nom_produit(first_page)
-        prix = self.get_prix_ttc(first_page)
-        self.infos_factures.append([first_page,PATCH_FICHIER,ORGINAL_NAME_FICHIER,date,id,nom,prix])
-        binarie_file.close()
-             
-    def get_all_info(self):
-        for contenus,chemins,original_name in self.contents:
-            self.get_ID(contenus)
-    
-    def init_contenus_folder(self):
-        for fichier in os.listdir(self.folder):
-            if os.path.isfile(os.path.join(self.folder, fichier)):
-                self.factures_folder.append([os.path.join(self.folder,fichier),fichier])
-
-    def get_ID(self,contenue):
-        numero_commande = re.search(self.PATTERN_ID,contenue)
-        if numero_commande:
-           return str(numero_commande.group(0))
-            # print("Numéro de commande:", numero_commande)
-        else:
-            return None
-            print("Aucun numéro de commande trouvé.")
-
-    def get_nom_produit(self,contenue):
-        return "amazon_prime"
-    
-    def get_date_achat(self,contenue):
-        date_commande = re.search(self.PATTERN_DATE,contenue)
-
-        if date_commande:
-            return str(date_commande.group(0))
-            # print("Date :", self.DATE_ACHAT)
-        else:
-            date_commande = re.search(self.PATTERN_DATE_ALTERNATIVE,contenue)
-            if date_commande:
-                return str(date_commande.group(0))
-            else:
-                return "None"
-                # print("Aucune date trouvée.")
-
-    def get_prix_ttc(self,contenue):
-        prix_total_TTC = re.search(self.PATTERN_PRIX_TTC,contenue)
-        if prix_total_TTC:
-            prix_total_TTC = prix_total_TTC.group(0)
-            return str(prix_total_TTC.replace(" ","").replace("€","").replace("TotalàpayerEUR",""))
-            # print("Prix :", prix_total_TTC)
-        else:
-            return "None"
-            # print("Aucun prix trouvé.")
-        
-    def set_name_fichier(self):
-        for facture in self.infos_factures: 
-                path_old = facture[1]
-                print("facture[5]zeezrzerrze",path_old)
-                nom_original = facture[2]
-                date = facture[3]
-                id = facture[4]
-                nom_produit = facture[5]
-                prix_ttc = facture[6]
-                print("date :", date)
-                print("id :", id)
-                print("nom_produit :", nom_produit)
-                print("prix_ttc :", prix_ttc)
-                nom_fichier = self.separateur.join([self.provenance,id])
-                # print(prix_total_TTC)
-                print(nom_fichier)
-                patch_new = os.path.join(FOLDER_LOCAL.AMAZON,f"{nom_fichier}.pdf")
-                print("liens_1",path_old)
-                print("liens_2",patch_new)
-                os.rename(path_old,patch_new)
  
-
 class MrLocal:
     def __init__(self) -> None:
-        self.list_factures_non_traiter = self.set_data_file(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
-        self.list_factures_archiver = self.set_data_file(FOLDER_LOCAL.FACTURE_ARCHIVER)
-        self.list_factures_inconnue = self.set_data_file(FOLDER_LOCAL.FACTURE_INCONNUE)
-        self.list_all_list_facture = []
-        self.rassembler_toute_les_facture()
-        self.facture_info_test = ({
-            "name" : "prime_D01-3598561-0389456.pdf",
-            "id" : "D01-3598561-0389456",
-            "date" : "29/05/2021",
-            "ttc" : 12.27,
-            "provenance" : "amazon"
-        })
+        self.list_factures_non_traiter = self.Get_path_name_fichier_in_folder(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
+        
     def refresh(self):
         self.list_factures_non_traiter = self.set_data_file(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
-        self.list_factures_archiver = self.set_data_file(FOLDER_LOCAL.FACTURE_ARCHIVER)
-        self.list_factures_inconnue = self.set_data_file(FOLDER_LOCAL.FACTURE_INCONNUE)
-        self.rassembler_toute_les_facture()
-        
-        
-    def rassembler_toute_les_facture(self):
-        self.list_all_list_facture.extend(self.list_factures_non_traiter)
-        self.list_all_list_facture.extend(self.list_factures_archiver)
-        self.list_all_list_facture.extend(self.list_factures_inconnue)
         
     @staticmethod
-    def local_move_file_formater(nom_facture,origine_path_facture,destination = FOLDER_LOCAL.FACTURE_ARCHIVER):
-        #bouge les fichier locals dans un dossier a un autre
-        facture_path_destination = os.path.join(destination,nom_facture) 
-        if os.path.isfile(origine_path_facture):
-            shutil.move(origine_path_facture,facture_path_destination)
+    def move_file(origine_path,destination = FOLDER_LOCAL.FACTURE_ARCHIVER):
+        #bouge les fichier locals dans un dossier a un autre a besoins uniquement du path d'origine
+        path_destination = os.path.join(destination,os.path.basename(origine_path)) 
+        if os.path.isfile(origine_path):
+            shutil.move(origine_path,path_destination)
         else : 
             print("fichier inexistant")
-
-
+            
     @staticmethod
-    def set_data_file(patch_dossier = FOLDER_LOCAL.FACTURE_PAS_TRAITER):
-        #recupere tout les fichiers formater en separant le site d'origine et l'id du fichier
-        all_facture_id_name_chem = []
-        for nom_fichier in os.listdir(patch_dossier):
-            if os.path.isfile(os.path.join(patch_dossier, nom_fichier)):
-                #lie le pdf
-                id_facture = nom_fichier.split("_")[1].split(".")[0]
-                all_facture_id_name_chem.append({
-                    "id":id_facture,
-                    "name":nom_fichier,
-                    "path" : os.path.join(patch_dossier,nom_fichier)}),
-
-                
-        return all_facture_id_name_chem
+    def Get_path_name_fichier_in_folder(dossier = FOLDER_LOCAL.FACTURE_PAS_TRAITER ):
+        liste_facture = []
+        for fichier in os.listdir(dossier):
+            if os.path.isfile(os.path.join(dossier)):
+                liste_facture.append(os.path.join(dossier,fichier))
+        return liste_facture
+    
+    # @staticmethod
+    # def set_data_formater_file(patch_dossier = FOLDER_LOCAL.FACTURE_PAS_TRAITER):
+    #     #recupere tout les fichiers formater en separant le site d'origine et l'id du fichier
+    #     all_facture_id_name_chem = []
+    #     for nom_fichier in os.listdir(patch_dossier):
+    #         if os.path.isfile(os.path.join(patch_dossier, nom_fichier)):
+    #             #lie le pdf
+    #             id_facture = nom_fichier.split("_")[1].split(".")[0]
+    #             all_facture_id_name_chem.append({
+    #                 "id":id_facture,
+    #                 "name":nom_fichier,
+    #                 "path" : os.path.join(patch_dossier,nom_fichier)}),         
+        # return all_facture_id_name_chem
 
 class MrDrive:
     def __init__(self) -> None:
@@ -356,15 +240,7 @@ class MrOrchestre():
         self.drive.refresh()
         
     def main_constructor(self):
-        # print(self.local.local_all_list_facture)
-        # print(self.sheet.list_all_value_colonne_id)
-        # self.grouper_info(self.local.list_all_list_facture,self.drive.list_all_facture)
-        # print(self.Super_liste_facture)
-        for facture in self.local.list_factures_non_traiter:
-            self.drive.upload_local_to_drive(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_EN_COURS,facture)
-            self.drive.refresh()
-            self.sheet.set_last_value_incrementale
-            self.drive.list_factures_en_cours[0]
+        
         
         
         pass
