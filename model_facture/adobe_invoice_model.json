@@ -1,0 +1,8 @@
+{
+    "provider": "Adobe",
+    "date": "Date de facturation\\s*\\n(\\d{2}-[A-Z]{3}-\\d{4})",
+    "price": "TOTAL\\(EUR\\)\\n(\\d{1,}\\.\\d{2})",
+    "provider": "Adobe Systems Software Ireland Ltd",
+    "id": "Numéro de commande\\n(\\d{1,})"
+    }
+  
