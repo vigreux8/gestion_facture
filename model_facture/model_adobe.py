@@ -10,7 +10,7 @@ from fonction_commun import facture_fonction_commun
 class ModelFacture(facture_fonction_commun):
     def __init__(self,path_facture_amazon_prime) -> None:
         super().__init__
-        self.provenance = "adobe"
+        self.provenance = "Adobe"
         print(f"instance : {self.provenance} active")
         self.separateur = "_"
         self.facture = {}
@@ -21,17 +21,21 @@ class ModelFacture(facture_fonction_commun):
         self.PATTERN_COUT_TTC = r"TTC\s(.*?)(?=\s\|)"
         self.PATTERN_DATE =  r"\b(\d{1,2}-[A-Z]{3}-\d{4})\b"
         self.PATTERN_PRIX_TTC = r"TOTAL\(EUR\)\s+(\d+\.\d{2})"
-        self.pattern_provenance = "IE6364992H"
-        print(re.search(self.pattern_provenance,self.contenue_pdf))
+        self.pattern_provenance_siren = "IE6364992H"
+        self.trouver = False
+        print(re.search(self.pattern_provenance_siren,self.contenue_pdf))
         self.get_contenue_pdf()
         self.cree_fichier_texte_contenue_document(self.contenue_pdf)
-        if  self.pattern_provenance in self.contenue_pdf:
+        if  self.pattern_provenance_siren in self.contenue_pdf:
             self.get_all_content_to_pdf()
-            self.print_contenue_info_facture()
+            self.infor_incomplete()
+            self.formater_name_file()
+            self.trouver = True
+            self.if_info_incomplete()
         else:
             print(f"se n'ai pas une facture {self.provenance}")
         # print(self.infos_factures[0][1:len(self.infos_factures[0])])
-        
+     
     def get_contenue_pdf(self):
         with open(self.facture["path"],"rb") as binarie_file:
             pdf_reader = PyPDF2.PdfReader(binarie_file)
@@ -74,19 +78,9 @@ class ModelFacture(facture_fonction_commun):
             # print("Aucun prix trouvé.")
         
 
-                
-    
-        
-#comment faire pour avoir un template de model
-
-
-# def main_test():
-#     chem_facture =  os.path.join("facture","pas traiter","adobe.pdf")
-#     facture = ModelFacture(chem_facture)
-    
-    #recupere tout les cles de facture et lis les valeur des clés
-    
-    
+def main_test():
+    chem_facture =  os.path.join("facture","pas traiter","adobe.pdf")
+    facture = ModelFacture(chem_facture)
         
 # main_test()
         

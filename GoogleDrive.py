@@ -15,8 +15,7 @@ import inspect
 
 class MrLocal:
     def __init__(self) -> None:
-        self.list_factures_non_traiter = self.Get_path_name_fichier_in_folder(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
-        self.modules_factures = []   
+        self.list_template_factures = []   
         self.pattern_class = "ModelFacture"
         self.init_model_class()
         
@@ -31,15 +30,7 @@ class MrLocal:
             shutil.move(origine_path,path_destination)
         else : 
             print("fichier inexistant")
-            
-
-    def Get_path_name_fichier_in_folder(self,dossier = FOLDER_LOCAL.FACTURE_PAS_TRAITER ):
-        liste_facture = []
-        for fichier in self.listdir_sans_pycache(dossier):
-            if os.path.isfile(os.path.join(dossier)):
-                liste_facture.append(os.path.join(dossier,fichier))
-        return liste_facture
-    
+                
     @staticmethod
     def listdir_sans_pycache(folder):
         list_fichier = os.listdir(folder)
@@ -48,8 +39,15 @@ class MrLocal:
             if not "__pycache__" in fichier:
                list_fichier_nettoyer.append(fichier)
         return list_fichier_nettoyer
-             
-            
+          
+    def listdir_path_complet_sans_pycache(self,folder):
+        list_fichier = os.listdir(folder)
+        list_fichier_nettoyer = []
+        for fichier in list_fichier:
+            if not "__pycache__" in fichier:
+               list_fichier_nettoyer.append(os.path.join(folder,fichier))
+        return list_fichier_nettoyer
+                      
     def init_model_class(self):
         for titre_module in (self.listdir_sans_pycache(FOLDER_LOCAL.DOSSIER_MODEL_FACTURE)):
             modules_factures = {}
@@ -59,7 +57,7 @@ class MrLocal:
             module = importlib.import_module(modules_factures["module"])
             ma_classe = getattr(module, self.pattern_class)
             modules_factures["class"] = ma_classe
-            self.modules_factures.append(modules_factures)
+            self.list_template_factures.append(modules_factures["class"])
                     
     
     # @staticmethod
@@ -202,8 +200,7 @@ class MrSheets():
         self.feuille1 = self.sheets.worksheet(f"{feuille}")
         self.index_association = self.init_lettre_associer_au_nom_colonne
         self.list_all_value_colonne_id = self.get_colonne_id_index_dict()
-    
-    
+      
     def get_colonne_id_index_dict(self):
         list_google_sheet = []
         for index,value in list(enumerate(self.feuille1.col_values(4)))[1:]:
@@ -264,9 +261,13 @@ class MrOrchestre():
         
     def main_constructor(self):
         # self.local.modules_factures[0]["class"]()
-        classe = self.local.modules_factures[0]["class"](os.path.join("facture","pas traiter","adobe.pdf"))    
-        
-        
+        list_facture_pas_traiter =  self.local.listdir_path_complet_sans_pycache(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
+        for facture in list_facture_pas_traiter:
+            for template_facture in self.local.list_template_factures:
+                instance =  template_facture(facture)
+                if instance.trouver:
+                    break
+            
         pass
     """crée une base donner sql pour savoir
         -ID : id_facture
