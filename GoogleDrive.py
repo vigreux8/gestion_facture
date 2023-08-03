@@ -2,7 +2,7 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from Setting.CONSTANTE import GOOGLE_AUTH,FOLDER_GOOGLESHEET
 import gspread
-from os import path
+import os
 from Setting.CONSTANTE import *
 import shutil
 import google.auth
@@ -10,10 +10,15 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import PyPDF2
 import re
- 
+import importlib
+import inspect
+
 class MrLocal:
     def __init__(self) -> None:
         self.list_factures_non_traiter = self.Get_path_name_fichier_in_folder(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
+        self.modules_factures = []   
+        self.pattern_class = "ModelFacture"
+        self.init_model_class()
         
     def refresh(self):
         self.list_factures_non_traiter = self.set_data_file(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
@@ -27,13 +32,35 @@ class MrLocal:
         else : 
             print("fichier inexistant")
             
-    @staticmethod
-    def Get_path_name_fichier_in_folder(dossier = FOLDER_LOCAL.FACTURE_PAS_TRAITER ):
+
+    def Get_path_name_fichier_in_folder(self,dossier = FOLDER_LOCAL.FACTURE_PAS_TRAITER ):
         liste_facture = []
-        for fichier in os.listdir(dossier):
+        for fichier in self.listdir_sans_pycache(dossier):
             if os.path.isfile(os.path.join(dossier)):
                 liste_facture.append(os.path.join(dossier,fichier))
         return liste_facture
+    
+    @staticmethod
+    def listdir_sans_pycache(folder):
+        list_fichier = os.listdir(folder)
+        list_fichier_nettoyer = []
+        for fichier in list_fichier:
+            if not "__pycache__" in fichier:
+               list_fichier_nettoyer.append(fichier)
+        return list_fichier_nettoyer
+             
+            
+    def init_model_class(self):
+        for titre_module in (self.listdir_sans_pycache(FOLDER_LOCAL.DOSSIER_MODEL_FACTURE)):
+            modules_factures = {}
+            titre_module = titre_module.replace(".py","")
+            modules_factures["module"] =  f"{FOLDER_LOCAL.DOSSIER_MODEL_FACTURE}.{titre_module}"
+            print(modules_factures["module"])
+            module = importlib.import_module(modules_factures["module"])
+            ma_classe = getattr(module, self.pattern_class)
+            modules_factures["class"] = ma_classe
+            self.modules_factures.append(modules_factures)
+                    
     
     # @staticmethod
     # def set_data_formater_file(patch_dossier = FOLDER_LOCAL.FACTURE_PAS_TRAITER):
@@ -62,8 +89,6 @@ class MrDrive:
             "provenance" : "amazon"
         })
         self.init_connexion_api()
-        self.list_archiver = self.get_all_file_drive_folder(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_ARCHIVER)
-        self.list_factures_inconnue = self.get_all_file_drive_folder(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_INCONNUE)
         self.list_factures_en_cours = self.get_all_file_drive_folder(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_EN_COURS)
         self.list_all_facture = []
         self.rassembler_toute_les_facture()
@@ -74,7 +99,7 @@ class MrDrive:
         self.list_factures_en_cours = self.get_all_file_drive_folder(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_EN_COURS)
             
     
-    def get_all_file_drive_folder(self,id_folder = FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_ARCHIVER ):
+    def get_all_file_drive_folder(self,id_folder ):
         #recuperais tout les dossier present dans le fichier google drive
         drive_liste = []
         file_liste = self.drive.ListFile({'q': f"'{id_folder}' in parents and trashed=false"}).GetList()
@@ -83,7 +108,7 @@ class MrDrive:
                 id_facture = file["title"].split("_")[1].split(".")[0]
                 drive_liste.append({
                     "name":file['title'],
-                    "id_facture": id_facture
+                    "id_facture": id_facture,
                     "google_file_id":file['id'],
                     "google_folder_id": id_folder,
                     "url" : file['alternateLink']
@@ -91,8 +116,6 @@ class MrDrive:
             return drive_liste
 
     def rassembler_toute_les_facture(self):
-        self.tchek_liste_vide(self.list_archiver)
-        self.tchek_liste_vide(self.list_factures_inconnue)
         self.tchek_liste_vide(self.list_factures_en_cours)
         
     def tchek_liste_vide(self,liste):
@@ -161,7 +184,7 @@ class MrDrive:
         self.key_connexion = key_connecte_google_drive
         self.drive = GoogleDrive(key_connecte_google_drive)
 
-    def upload_local_to_drive(self,id_dossier_destionation = FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_ARCHIVER,facture ):
+    def upload_local_to_drive(self,id_dossier_destionation,facture ):
             drive_facture_traiter = self.drive.CreateFile(
             {
             'parents': [{'id': id_dossier_destionation}],
@@ -227,7 +250,7 @@ class MrSheets():
         pass
         
     #recuperer tout les id du fichier google sheet
-    
+   
 class MrOrchestre():
     def __init__(self) -> None:
         self.sheet = MrSheets()
@@ -240,7 +263,8 @@ class MrOrchestre():
         self.drive.refresh()
         
     def main_constructor(self):
-        
+        # self.local.modules_factures[0]["class"]()
+        classe = self.local.modules_factures[0]["class"](os.path.join("facture","pas traiter","adobe.pdf"))    
         
         
         pass

@@ -3,13 +3,15 @@ import PyPDF2
 import re
 from Setting.CONSTANTE import FOLDER_LOCAL
 import importlib
+from fonction_commun import facture_fonction_commun
 
 #comment savoir que j'ai tester tout les models ? 
 
-class facture_amazon_produits():
+class ModelFacture():
     def __init__(self,path_facture) -> None:
         self.provenance = "amazon_produit"
-        self.separateur = "_"
+        print(f"instance : {self.provenance} active")
+        self.separateur = "_"  
         self.facture = {}
         self.contenue_pdf = ""
         self.facture["path"] = path_facture
@@ -23,8 +25,10 @@ class facture_amazon_produits():
         self.cree_fichier_texte_contenue_document(self.contenue_pdf)
         if  self.pattern_provenance_siren in self.contenue_pdf:
             self.get_all_content_to_pdf()
+            self.print_contenue_info_facture()
+            
         else:
-            print("facture_inconnue")
+            print(f"se n'ai pas une facture {self.provenance}")
         # print(self.infos_factures[0][1:len(self.infos_factures[0])])
         
     def get_contenue_pdf(self):
@@ -101,14 +105,13 @@ class facture_amazon_produits():
 #comment faire pour avoir un template de model
 
 
-def main_test():
-    chem_facture =  os.path.join("facture","pas traiter","adobe.pdf")
-    facture = facture_amazon_prime(chem_facture)
+# def main_test():
+#     chem_facture =  os.path.join("facture","pas traiter","adobe.pdf")
+#     facture = ModelFacture(chem_facture)
     
-    #recupere tout les cles de facture et lis les valeur des clés
-    for key in list(facture.facture):
-        print(key,":",facture.facture[key])
-    
-        
-main_test()
+#     #recupere tout les cles de facture et lis les valeur des clés
+#     for key in list(facture.facture):
+#         print(key,":",facture.facture[key])
+      
+# main_test()
         

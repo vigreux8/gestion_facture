@@ -3,11 +3,13 @@ import os
 class FOLDER_LOCAL():
     DOSSIER_FACTURE = "facture"
     DOSSIER_CONTENUE_PDF = "ContenuePdf"
+    DOSSIER_MODEL_FACTURE = "model_facture"
     AMAZON = os.path.join(".",DOSSIER_FACTURE,"amazon")
     AMAZON_PRIME = os.path.join(".",DOSSIER_FACTURE,"amazon_prime")
     FACTURE_PAS_TRAITER = os.path.join(".",DOSSIER_FACTURE,"pas traiter")
     FACTURE_ARCHIVER = os.path.join(".",DOSSIER_FACTURE,"archiver")
     FACTURE_INCONNUE= os.path.join(".",DOSSIER_FACTURE,"inconnue")
+    MODEL_FACTURE = os.path.join(".",DOSSIER_MODEL_FACTURE)
     
     
 
