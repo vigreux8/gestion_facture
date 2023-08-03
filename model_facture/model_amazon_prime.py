@@ -10,7 +10,7 @@ from fonction_commun import facture_fonction_commun
 
 class ModelFacture(facture_fonction_commun):
     def __init__(self,path_facture_amazon_prime) -> None:
-        super().__init__
+        super().__init__()
         
         self.provenance = "AmazonPrime"
         print(f"instance : {self.provenance} active")
@@ -32,7 +32,8 @@ class ModelFacture(facture_fonction_commun):
         self.cree_fichier_texte_contenue_document(self.contenue_pdf)
         if  self.pattern_provenance_siren in self.contenue_pdf:
             self.get_all_content_to_pdf()
-            self.infor_incomplete()
+            self.if_info_incomplete()
+            self.print_all_info()
             self.formater_name_file()
             self.trouver = True
             
@@ -71,6 +72,8 @@ class ModelFacture(facture_fonction_commun):
                 return str(date_commande.group(0))
             # print("Date :", self.DATE_ACHAT)
                 # print("Aucune date trouvée.")
+        else:
+            return None
 
     def get_prix_ttc(self,contenue):
         prix_total_TTC = re.search(self.PATTERN_PRIX_TTC,contenue)
@@ -78,7 +81,7 @@ class ModelFacture(facture_fonction_commun):
             return prix_total_TTC.group(1)
             # print("Prix :", prix_total_TTC)
         else:
-            return "None"
+            return None
             # print("Aucun prix trouvé.")
 
 #comment faire pour avoir un template de model

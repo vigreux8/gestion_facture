@@ -3,16 +3,21 @@ from Setting.CONSTANTE import FOLDER_LOCAL
 
 class facture_fonction_commun():
     def __init__(self) -> None:
-        pass
+        self.message_erreur_info_incomplete = "InfoManquante"
     
     def if_info_incomplete(self):
+        key_none = []
         for key in list(self.facture):
-            if not self.facture[key]:
-                self.facture_id = "InformationIncompletes"
+            if self.facture[key] == None:
+                key_none.append(key)
+        if key_none:        
+            self.message_erreur_info_incomplete ="_".join((self.message_erreur_info_incomplete,f"{key}")) 
+            self.facture["id"] = self.message_erreur_info_incomplete
     
-    def infor_incomplete(self):
+    def print_all_info(self):
         for key in list(self.facture):
             print(key,":",self.facture[key])
+            print(self.facture[key] == None)
             
     def formater_name_file(self):
         path_original = self.facture["path"]
@@ -20,9 +25,13 @@ class facture_fonction_commun():
         repertoir_parent = os.path.dirname(path_original)
         separateur = "_"
         new_nom_fichier = separateur.join([self.provenance,f"{self.facture['id']}{extension}"])
-        patch_new = os.path.join(repertoir_parent,new_nom_fichier)
-        if not patch_new == path_original:
-            os.rename(path_original,patch_new)
+        #si message erreur donner manquante
+        if self.facture["id"] == self.message_erreur_info_incomplete:
+            patch_new = os.path.join(FOLDER_LOCAL.FACTURE_INFO_MANQUANTE,new_nom_fichier)
+        else:
+            patch_new = os.path.join(repertoir_parent,new_nom_fichier)
+        
+        os.rename(path_original,patch_new)
     
     def cree_fichier_texte_contenue_document(self,page,nom_fichier = ""):
         chemin_dossier = FOLDER_LOCAL.DOSSIER_CONTENUE_PDF

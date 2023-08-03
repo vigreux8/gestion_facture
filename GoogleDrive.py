@@ -59,7 +59,15 @@ class MrLocal:
             modules_factures["class"] = ma_classe
             self.list_template_factures.append(modules_factures["class"])
                     
-    
+    def formater_name_inconnue(self):
+        path_original = self.facture["path"]
+        extension = os.path.splitext(path_original)[-1]
+        repertoir_parent = os.path.dirname(path_original)
+        separateur = "_"
+        new_nom_fichier = separateur.join([self.provenance,f"{self.facture['id']}{extension}"])
+        patch_new = os.path.join(repertoir_parent,new_nom_fichier)
+        if not patch_new == path_original:
+            os.rename(path_original,patch_new)
     # @staticmethod
     # def set_data_formater_file(patch_dossier = FOLDER_LOCAL.FACTURE_PAS_TRAITER):
     #     #recupere tout les fichiers formater en separant le site d'origine et l'id du fichier
@@ -262,11 +270,22 @@ class MrOrchestre():
     def main_constructor(self):
         # self.local.modules_factures[0]["class"]()
         list_facture_pas_traiter =  self.local.listdir_path_complet_sans_pycache(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
+        list_element_inconnue = []
         for facture in list_facture_pas_traiter:
             for template_facture in self.local.list_template_factures:
                 instance =  template_facture(facture)
                 if instance.trouver:
                     break
+        liste_valide_facture_pas_traiter = self.local.listdir_path_complet_sans_pycache(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
+        #recuperais id present dans le sheets
+        #comparer les fichier 
+        #transferer les fichier non present dans sheets
+        #recuperais les fichier present dans le drive 
+        #comparer l'id pour recuperer l'id Fichier et pathalternative
+        #crée l'url 
+        #mettre les valeurs à la suite de la dernier valeurs
+        #deplacer les ficier drive dans archiver
+            
             
         pass
     """crée une base donner sql pour savoir

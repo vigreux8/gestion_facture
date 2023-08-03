@@ -8,7 +8,9 @@ class FOLDER_LOCAL():
     AMAZON_PRIME = os.path.join(".",DOSSIER_FACTURE,"amazon_prime")
     FACTURE_PAS_TRAITER = os.path.join(".",DOSSIER_FACTURE,"pas traiter")
     FACTURE_ARCHIVER = os.path.join(".",DOSSIER_FACTURE,"archiver")
+    FACTURE_INFO_MANQUANTE= os.path.join(".",DOSSIER_FACTURE,"info_manquante")
     FACTURE_INCONNUE= os.path.join(".",DOSSIER_FACTURE,"inconnue")
+    
     MODEL_FACTURE = os.path.join(".",DOSSIER_MODEL_FACTURE)
     
     
