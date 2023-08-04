@@ -23,9 +23,9 @@ class MrLocal:
         self.list_factures_non_traiter = self.set_data_file(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
         
     @staticmethod
-    def move_file(origine_path,destination = FOLDER_LOCAL.FACTURE_ARCHIVER):
+    def move_file(origine_path,dossier_destination = FOLDER_LOCAL.FACTURE_ARCHIVER):
         #bouge les fichier locals dans un dossier a un autre a besoins uniquement du path d'origine
-        path_destination = os.path.join(destination,os.path.basename(origine_path)) 
+        path_destination = os.path.join(dossier_destination,os.path.basename(origine_path)) 
         if os.path.isfile(origine_path):
             shutil.move(origine_path,path_destination)
         else : 
@@ -86,18 +86,9 @@ class MrDrive:
     def __init__(self) -> None:
         self.key_connexion = None
         self.drive = None
-        self.facture_info = ({
-            "name" : "D01-3598561-0389456",
-            "id_drive" : "D01-3598561-0389456",
-            "id" : "D01-3598561-0389456",
-            "date" : "29/05/2021",
-            "ttc" : 12.27,
-            "provenance" : "amazon"
-        })
         self.init_connexion_api()
         self.list_factures_en_cours = self.get_all_file_drive_folder(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_EN_COURS)
         self.list_all_facture = []
-        self.rassembler_toute_les_facture()
     
     def refresh(self):
         self.list_archiver = self.get_all_file_drive_folder(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_ARCHIVER)
@@ -121,14 +112,11 @@ class MrDrive:
                 })
             return drive_liste
 
-    def rassembler_toute_les_facture(self):
-        self.tchek_liste_vide(self.list_factures_en_cours)
-        
     def tchek_liste_vide(self,liste):
         if liste:
             self.list_all_facture.extend(liste)
         
-    def drive_move_file_to_folder(self,file_id, folder_id):
+    def drive_move_file_to_folder(self,file_id_original, folder_id):
         """Move specified file to the specified folder.
         Args:
             file_id: Id of the file to move.
@@ -147,10 +135,10 @@ class MrDrive:
 
             # pylint: disable=maybe-no-member
             # Retrieve the existing parents to remove
-            file = service.files().get(fileId=file_id, fields='parents').execute()
+            file = service.files().get(fileId=file_id_original, fields='parents').execute()
             previous_parents = ",".join(file.get('parents'))
             # Move the file to the new folder
-            file = service.files().update(fileId=file_id, addParents=folder_id,
+            file = service.files().update(fileId=file_id_original, addParents=folder_id,
                                         removeParents=previous_parents,
                                         fields='id, parents').execute()
         except HttpError as error:
@@ -190,16 +178,15 @@ class MrDrive:
         self.key_connexion = key_connecte_google_drive
         self.drive = GoogleDrive(key_connecte_google_drive)
 
-    def upload_local_to_drive(self,id_dossier_destionation,facture ):
+    def upload_local_to_drive(self,id_dossier_destionation,facture_local ):
             drive_facture_traiter = self.drive.CreateFile(
             {
             'parents': [{'id': id_dossier_destionation}],
-            "title" : facture["id"]
+            "title" : facture_local["id"]
             })
-            drive_facture_traiter.SetContentFile(facture["path"])
+            drive_facture_traiter.SetContentFile(facture_local["path"])
             drive_facture_traiter.Upload()
     
-
 class MrSheets():
     def __init__(self,compte_mail_json=GOOGLE_AUTH.KEY_MAILS_AUTH,file_sheets=FOLDER_GOOGLESHEET.FACTURE,feuille="Feuille1") -> None:
         #self.file = gspread.oauth(credentials_filename=GOOGLE_AUTH.KEY_AUTH_OAUTH,authorized_user_filename=GOOGLE_AUTH.KEY_TOKEN_REFRESH)
@@ -268,34 +255,50 @@ class MrOrchestre():
         self.drive.refresh()
         
     def main_constructor(self):
-        # self.local.modules_factures[0]["class"]()
         list_facture_pas_traiter =  self.local.listdir_path_complet_sans_pycache(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
-        list_element_inconnue = []
-        for facture in list_facture_pas_traiter:
+        list_element_inconnue = list_facture_pas_traiter.copy()
+        for path_facture in list_facture_pas_traiter:
             for template_facture in self.local.list_template_factures:
-                instance =  template_facture(facture)
+                instance =  template_facture(path_facture)
                 if instance.trouver:
+                    list_element_inconnue.remove(path_facture)
                     break
-        liste_valide_facture_pas_traiter = self.local.listdir_path_complet_sans_pycache(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
-        #recuperais id present dans le sheets
-        #comparer les fichier 
-        #transferer les fichier non present dans sheets
-        #recuperais les fichier present dans le drive 
-        #comparer l'id pour recuperer l'id Fichier et pathalternative
-        #crée l'url 
-        #mettre les valeurs à la suite de la dernier valeurs
-        #deplacer les ficier drive dans archiver
+                
+        if list_element_inconnue:
+            for path_facture in list_element_inconnue:
+                index = str(len(os.listdir(FOLDER_LOCAL.FACTURE_INCONNUE)))
+                path_facture = self.formater_name_file(path_facture,index)
+                self.local.move_file(path_facture,FOLDER_LOCAL.FACTURE_INCONNUE)
             
+        # for facture in list_facture_pas_traiter:
+        #     if facture in new_list_facture_pas_traiter:
+        #         list_element_inconnue
+        #[OK]gerer les facture inconnue
+        #[]]upload facture inconnue dans drive
+        #[]upload donner manquante dans drive
+        
+        
+        #[]recuperais id present dans le sheets
+        #[]comparer les fichier 
+        #[]transferer les fichier non present dans sheets
+        #[]recuperais les fichier present dans le drive 
+        #[]comparer l'id pour recuperer l'id Fichier et pathalternative
+        #[]crée l'url 
+        #[]mettre les valeurs à la suite de la dernier valeurs
+        #[]deplacer les ficier drive dans archiver
             
-        pass
-    """crée une base donner sql pour savoir
-        -ID : id_facture
-        -name : string
-        -present_sheet : BOOl
-        -Present_drive_archiver : BOOL
-        -id_drive :
-        -patch_local :
-    """
+    def formater_name_file(self,path_file : str,index :str, message = ["facture","inconnue"]):
+        path_original = path_file
+        extension = os.path.splitext(path_file)[-1]
+        message.append(index)
+        message[-1] +=extension
+        repertoir_parent = os.path.dirname(path_file)
+        separateur = "_"
+        new_nom_fichier = separateur.join(message)
+        #si message erreur donner manquante
+        patch_new = os.path.join(repertoir_parent,new_nom_fichier)
+        os.rename(path_original,patch_new)
+        return patch_new
 
 main = MrOrchestre()
 main.main_constructor()

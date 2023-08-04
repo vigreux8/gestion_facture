@@ -19,7 +19,7 @@ class facture_fonction_commun():
             print(key,":",self.facture[key])
             print(self.facture[key] == None)
             
-    def formater_name_file(self):
+    def formater_name_facture(self):
         path_original = self.facture["path"]
         extension = os.path.splitext(path_original)[-1]
         repertoir_parent = os.path.dirname(path_original)

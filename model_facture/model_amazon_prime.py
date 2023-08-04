@@ -34,7 +34,7 @@ class ModelFacture(facture_fonction_commun):
             self.get_all_content_to_pdf()
             self.if_info_incomplete()
             self.print_all_info()
-            self.formater_name_file()
+            self.formater_name_facture()
             self.trouver = True
             
         else:
