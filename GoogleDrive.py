@@ -255,30 +255,39 @@ class MrOrchestre():
         self.drive.refresh()
         
     def main_constructor(self):
+        #gestion_erreur
         list_facture_pas_traiter =  self.local.listdir_path_complet_sans_pycache(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
         list_element_inconnue = list_facture_pas_traiter.copy()
+        #[]recuperais id present dans le sheets
+        
         for path_facture in list_facture_pas_traiter:
             for template_facture in self.local.list_template_factures:
                 instance =  template_facture(path_facture)
                 if instance.trouver:
+                    #upload fichier + information
                     list_element_inconnue.remove(path_facture)
+                    #[] si id instance present dans id sheets deplacer dans archiver_local
+                    #[] upload le fichier dans id_dossier_drive_en_cours
+                    
                     break
-                
         if list_element_inconnue:
             for path_facture in list_element_inconnue:
                 index = str(len(os.listdir(FOLDER_LOCAL.FACTURE_INCONNUE)))
                 path_facture = self.formater_name_file(path_facture,index)
                 self.local.move_file(path_facture,FOLDER_LOCAL.FACTURE_INCONNUE)
-            
-        # for facture in list_facture_pas_traiter:
-        #     if facture in new_list_facture_pas_traiter:
-        #         list_element_inconnue
-        #[OK]gerer les facture inconnue
-        #[]]upload facture inconnue dans drive
-        #[]upload donner manquante dans drive
+        
+        #fonction upload   
+            #[]upload donner manquante dans drive :  DOSSIER_local,patch_fichier,ID_dossier_drive
+            #[]]upload facture inconnue dans drive : DOSSIER_local,patch_fichier,ID_dossier_drive
         
         
-        #[]recuperais id present dans le sheets
+        
+        #[OK]gerer les facture inconnue_local
+        
+        
+        
+        
+        
         #[]comparer les fichier 
         #[]transferer les fichier non present dans sheets
         #[]recuperais les fichier present dans le drive 
