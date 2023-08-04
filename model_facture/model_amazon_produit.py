@@ -16,7 +16,7 @@ class ModelFacture(facture_fonction_commun):
         self.facture = {}
         self.contenue_pdf = ""
         self.facture["path"] = path_facture
-        self.facture["nom_fichier"] = os.path.basename(path_facture) 
+        self.facture["name"] = os.path.basename(path_facture) 
         self.PATTERN_ID = r"Numéro de la commande ([\d-]+)"
         self.PATTERN_DATE =  r"(\d{2}\.\d{2}\.\d{4})"
         self.PATTERN_PRIX_TTC = r"Total à payer (\d+\,\d{2}) €"
@@ -46,7 +46,7 @@ class ModelFacture(facture_fonction_commun):
     def get_all_content_to_pdf(self): 
             self.facture["date"] = self.get_date_achat(self.contenue_pdf)
             self.facture["id"] = self.get_ID(self.contenue_pdf)
-            self.facture["nom_produit"] = self.provenance
+            self.facture["provenance"] = self.provenance
             self.facture["ttc"] = self.get_prix_ttc(self.contenue_pdf)
 
     def get_ID(self,contenue):

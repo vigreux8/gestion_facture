@@ -30,3 +30,14 @@ class FOLDER_GOOGLEDRIVE():
     ID_DOSSIER_FACTURE_ARCHIVER = "1y27_FsNR0PRaxNz564CI27L_jK1sZnFp"
     ID_DOSSIER_FACTURE_INCONNUE = "1xrYm-Wo_8jpvbfo3srmdMdsds1mptfXL"
     ID_DOSSIER_FACTURE_EN_COURS = "1fbgY3MimnRgRk6MqxTt23AKIqegz7pCC"
+    ID_DOSSIER_FACTURE_TAMPON = "1TznVt-En12t2TEmU0NDsUxJ8k6G2tUv4"
+    
+class KEY_INFOMRATION():
+    CONTROLLER = "controller"
+    DATE ="date"
+    TTC = "ttc"
+    URL = "url"
+    RAISON = "raison"
+    PROVENANCE = "provenance"
+    PERSONNE = "personne"
+    REMBOURSER = "rembourser"

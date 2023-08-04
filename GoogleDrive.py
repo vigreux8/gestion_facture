@@ -17,7 +17,7 @@ class MrLocal:
     def __init__(self) -> None:
         self.list_template_factures = []   
         self.pattern_class = "ModelFacture"
-        self.init_model_class()
+        self.init_model_class_dynamique()
         
     def refresh(self):
         self.list_factures_non_traiter = self.set_data_file(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
@@ -48,7 +48,7 @@ class MrLocal:
                list_fichier_nettoyer.append(os.path.join(folder,fichier))
         return list_fichier_nettoyer
                       
-    def init_model_class(self):
+    def init_model_class_dynamique(self):
         for titre_module in (self.listdir_sans_pycache(FOLDER_LOCAL.DOSSIER_MODEL_FACTURE)):
             modules_factures = {}
             titre_module = titre_module.replace(".py","")
@@ -98,18 +98,17 @@ class MrDrive:
     
     def get_all_file_drive_folder(self,id_folder ):
         #recuperais tout les dossier present dans le fichier google drive
-        drive_liste = []
+        drive_liste = {}
         file_liste = self.drive.ListFile({'q': f"'{id_folder}' in parents and trashed=false"}).GetList()
-        if file_liste:
+        if file_liste :
             for file in file_liste:
-                id_facture = file["title"].split("_")[1].split(".")[0]
-                drive_liste.append({
-                    "name":file['title'],
-                    "id_facture": id_facture,
-                    "google_file_id":file['id'],
+                drive_liste = {
+                    "google_name":file['title'],
+                    "google_id_facture": file['title'].replace(".pdf","").split("_")[1],
+                    "google_id":file['id'],
                     "google_folder_id": id_folder,
-                    "url" : file['alternateLink']
-                })
+                    "google_url" : file['alternateLink']
+                }
             return drive_liste
 
     def tchek_liste_vide(self,liste):
@@ -182,7 +181,7 @@ class MrDrive:
             drive_facture_traiter = self.drive.CreateFile(
             {
             'parents': [{'id': id_dossier_destionation}],
-            "title" : facture_local["id"]
+            "title" : facture_local["name"]
             })
             drive_facture_traiter.SetContentFile(facture_local["path"])
             drive_facture_traiter.Upload()
@@ -190,13 +189,21 @@ class MrDrive:
 class MrSheets():
     def __init__(self,compte_mail_json=GOOGLE_AUTH.KEY_MAILS_AUTH,file_sheets=FOLDER_GOOGLESHEET.FACTURE,feuille="Feuille1") -> None:
         #self.file = gspread.oauth(credentials_filename=GOOGLE_AUTH.KEY_AUTH_OAUTH,authorized_user_filename=GOOGLE_AUTH.KEY_TOKEN_REFRESH)
+        self.info_associer_col = {
+            KEY_INFOMRATION.CONTROLLER:"a",
+            KEY_INFOMRATION.DATE:"b",
+            KEY_INFOMRATION.TTC:"c",
+            KEY_INFOMRATION.URL:"d",
+            KEY_INFOMRATION.RAISON:"e",
+            KEY_INFOMRATION.PROVENANCE:"f",
+            KEY_INFOMRATION.PERSONNE:"g",
+            KEY_INFOMRATION.REMBOURSER:"i"}    
         self.file = gspread.service_account(filename=compte_mail_json)
         self.sheets = self.file.open(file_sheets)
         self.feuille1 = self.sheets.worksheet(f"{feuille}")
-        self.index_association = self.init_lettre_associer_au_nom_colonne
-        self.list_all_value_colonne_id = self.get_colonne_id_index_dict()
-      
-    def get_colonne_id_index_dict(self):
+        self.list_all_value_colonne_id = self.get_id_facture_index_col_dict
+        
+    def get_id_facture_index_col_dict(self):
         list_google_sheet = []
         for index,value in list(enumerate(self.feuille1.col_values(4)))[1:]:
             list_google_sheet.append({
@@ -214,32 +221,28 @@ class MrSheets():
         dernier_valeur = self.feuille1.acell(f"{colonne}{index_ligne}").value 
         return index_ligne,dernier_valeur
 
-    def init_lettre_associer_au_nom_colonne(self,ligne: int=1):
+    def set_information(self,ligne: int=1):
         all_name_colonnes = self.feuille1.row_values(1)
-        self.correspondance_index_to_letter = {
-            1:"a",
-            2:"b",
-            3:"c",
-            4:"d",
-            5:"e",
-            6:"f",
-            7:"h"
+        print(all_name_colonnes)
+        # all_colonnes_and_lettres = {}
+        # for name_colonne in all_name_colonnes:
+        #     # all_colonnes_and_lettres.append((correspondance_index_to_letter[index],name_colonne))
+        #     all_colonnes_and_lettres[self.converssion_ligne_num_to_abc[ligne]] = name_colonne
+        #     ligne += 1
+        # return all_colonnes_and_lettres
+
+    def ecrire_apres_dernier_valeur_col(self,facture_info,colonne:str = "a",):
+        index_ligne = self.get_last_value_col(colonne)[0]
+        for key in list(self.info_associer_col):
+            self.feuille1.update(f"{self.info_associer_col[key]}{index_ligne+1}",facture_info[key])
+            if key == KEY_INFOMRATION.URL:
+                self.feuille1.update(f"{self.info_associer_col[key]}{index_ligne+1}",facture_info[key], raw=False)
                 
-        }
-        all_colonnes_and_lettres = {}
-        index = 1
-        for name_colonne in all_name_colonnes:
-            # all_colonnes_and_lettres.append((correspondance_index_to_letter[index],name_colonne))
-            all_colonnes_and_lettres[self.correspondance_index_to_letter[index]] = name_colonne
-            index +=1
-        return all_colonnes_and_lettres
-
-    def set_last_value_incrementale(self,colonne:str = "a"):
-        index_ligne,dernier_valeur = self.get_last_value_col(colonne)
-        self.feuille1.update(f"{colonne}{index_ligne+1}",dernier_valeur+1)
-
+    
+    
     def main_constructeur(self):
-        pass
+        print(self.get_dict_name_to_lettre_colonne())
+        
         
     #recuperer tout les id du fichier google sheet
    
@@ -253,23 +256,55 @@ class MrOrchestre():
     def refresh(self):
         self.sheet.refresh()
         self.drive.refresh()
-        
+    
+    @staticmethod
+    def formatage_info_a_ecrire_sheet(controller,date,ttc,url,raison,provenance,personne,rembourser):
+        info_facture_dict = {
+            KEY_INFOMRATION.CONTROLLER: controller,
+            KEY_INFOMRATION.DATE: date,
+            KEY_INFOMRATION.TTC: ttc,
+            KEY_INFOMRATION.URL: url,
+            KEY_INFOMRATION.RAISON: raison,
+            KEY_INFOMRATION.PROVENANCE: provenance,
+            KEY_INFOMRATION.PERSONNE: personne,
+            KEY_INFOMRATION.REMBOURSER: rembourser}  
+        return info_facture_dict  
     def main_constructor(self):
         #gestion_erreur
         list_facture_pas_traiter =  self.local.listdir_path_complet_sans_pycache(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
         list_element_inconnue = list_facture_pas_traiter.copy()
+        index_id_sheet = self.sheet.get_id_facture_index_col_dict()
         #[]recuperais id present dans le sheets
         
         for path_facture in list_facture_pas_traiter:
             for template_facture in self.local.list_template_factures:
                 instance =  template_facture(path_facture)
                 if instance.trouver:
+                    list_id_sheet = []
                     #upload fichier + information
                     list_element_inconnue.remove(path_facture)
                     #[] si id instance present dans id sheets deplacer dans archiver_local
+                    for cellule in index_id_sheet:
+                         list_id_sheet.append(cellule["id"])
+                         
+                    if cellule["id"] in instance.facture["id"]:
+                            self.local.move_file(instance.facture["path"],FOLDER_LOCAL.FACTURE_ARCHIVER)
+                            
+                    else:
+                        self.drive.upload_local_to_drive(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_TAMPON,instance.facture)
+                        instance.facture = {**instance.facture,**self.drive.get_all_file_drive_folder(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_TAMPON)}
+                        google_url = instance.facture['google_url']
+                        id_facture = instance.facture['id']
+                        cellule_url_id = '=HYPERLINK("{}"; "{}")'.format(google_url, id_facture)  #crée l'url
+                        self.drive.drive_move_file_to_folder(instance.facture["google_id"],FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_ARCHIVER)
+                        facture_info_formater_sheet = self.formatage_info_a_ecrire_sheet(False,instance.facture['date'],instance.facture['ttc'],cellule_url_id,"",instance.facture['provenance'],"elies",False)
+                        self.sheet.ecrire_apres_dernier_valeur_col(facture_info_formater_sheet)
+                    break
+
                     #[] upload le fichier dans id_dossier_drive_en_cours
                     
                     break
+        list_file_drive =  self.drive.get_all_file_drive_folder(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_EN_COURS)
         if list_element_inconnue:
             for path_facture in list_element_inconnue:
                 index = str(len(os.listdir(FOLDER_LOCAL.FACTURE_INCONNUE)))
@@ -311,4 +346,7 @@ class MrOrchestre():
 
 main = MrOrchestre()
 main.main_constructor()
+
+# main_sheet = MrSheets()
+# main_sheet.main_constructeur()
 

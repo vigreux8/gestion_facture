@@ -16,7 +16,7 @@ class ModelFacture(facture_fonction_commun):
         self.facture = {}
         self.contenue_pdf = ""
         self.facture["path"] = path_facture_amazon_prime
-        self.facture["nom_fichier"] = os.path.basename(path_facture_amazon_prime) 
+        self.facture["name"] = os.path.basename(path_facture_amazon_prime) 
         self.PATTERN_ID = r'Numéro de commande\s+(\d+)'
         self.PATTERN_COUT_TTC = r"TTC\s(.*?)(?=\s\|)"
         self.PATTERN_DATE =  r"\b(\d{1,2}-[A-Z]{3}-\d{4})\b"
@@ -45,7 +45,7 @@ class ModelFacture(facture_fonction_commun):
     def get_all_content_to_pdf(self): 
             self.facture["date"] = self.get_date_achat(self.contenue_pdf)
             self.facture["id"] = self.get_ID(self.contenue_pdf)
-            self.facture["nom_produit"] = self.provenance
+            self.facture["provenance"] = self.provenance
             self.facture["ttc"] = self.get_prix_ttc(self.contenue_pdf)
     
     def get_ID(self,contenue):

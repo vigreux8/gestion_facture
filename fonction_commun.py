@@ -15,10 +15,11 @@ class facture_fonction_commun():
             self.facture["id"] = self.message_erreur_info_incomplete
     
     def print_all_info(self):
-        for key in list(self.facture):
-            print(key,":",self.facture[key])
-            print(self.facture[key] == None)
-            
+        # for key in list(self.facture):
+        #     print(key,":",self.facture[key])
+        #     print(self.facture[key] == None)
+        pass
+    
     def formater_name_facture(self):
         path_original = self.facture["path"]
         extension = os.path.splitext(path_original)[-1]
@@ -37,7 +38,7 @@ class facture_fonction_commun():
         chemin_dossier = FOLDER_LOCAL.DOSSIER_CONTENUE_PDF
         extension = ".txt"
         if nom_fichier == "":
-            nom_fichier = self.facture["nom_fichier"].replace(".pdf","")
+            nom_fichier = self.facture["name"].replace(".pdf","")
             nom_fichier = f"{nom_fichier}{extension}"
         else:
             nom_fichier = f"{nom_fichier}{extension}"
