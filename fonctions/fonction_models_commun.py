@@ -14,15 +14,19 @@ class facture_fonction_commun():
         self.contenue_pdf = ""
         self.separateur_rename = OPTION_LOCAL.SEPARATEUR
       
-    def get_contenue_pdf(self):
-        with open(self.facture["path"],"rb") as binarie_file:
-            pdf_reader = PyPDF2.PdfReader(binarie_file)
-            first_page = pdf_reader.pages[0]
-            self.contenue_pdf = first_page.extract_text()
+    def get_contenue_pdf(self,path = None ):
+        if not path:
+            with open(self.facture["path"],"rb") as binarie_file:
+                pdf_reader = PyPDF2.PdfReader(binarie_file)
+                first_page = pdf_reader.pages[0]
+                self.contenue_pdf = first_page.extract_text()
+        else:
+            with open(path,"rb") as binarie_file:
+                pdf_reader = PyPDF2.PdfReader(binarie_file)
+                first_page = pdf_reader.pages[0]
+            return first_page.extract_text()
             
     def f_date(self):
-        #F pour format date 
-        #si le format de la date n'ai pas JJ/MM/YYYY
         facture_date = self.facture['date']
         try:
             date_obj = parse(facture_date)
@@ -39,7 +43,6 @@ class facture_fonction_commun():
                 self.facture["date"] = date_obj
             except ValueError as error:
                 print("An error occurred:", str(error))
-    
     
     def if_info_incomplete(self):
         key_none = []
@@ -71,19 +74,38 @@ class facture_fonction_commun():
             self.facture["name"] = os.path.basename(self.facture["path"])
         os.rename(path_original,self.facture["path"])
            
-    def cree_fichier_texte_contenue_document(self,page,nom_fichier = ""):
+    def cree_fichier_texte_contenue_document(self,path_fichier = None):
         chemin_dossier = FOLDER_LOCAL.DOSSIER_CONTENUE_PDF
         extension = ".txt"
-        if nom_fichier == "":
-            nom_fichier = self.facture["name"].replace(".pdf","")
-            nom_fichier = f"{nom_fichier}{extension}"
+        if path_fichier:
+            path_fichier = os.path.basename(self.facture["path"])
+            path_fichier = f"{path_fichier}{extension}"
+            contenue = self.contenue_pdf
         else:
+            nom_fichier = os.path.basename(path_fichier)
+            contenue = self.get_contenue_pdf(path_fichier)
             nom_fichier = f"{nom_fichier}{extension}"
         
-        chemins_fichier = os.path.join(FOLDER_LOCAL.DOSSIER_CONTENUE_PDF,nom_fichier)
+        chemins_fichier = os.path.join(FOLDER_LOCAL.DOSSIER_CONTENUE_PDF,path_fichier)
         
         if  os.path.exists(chemins_fichier):
             print("fichier déjat existant")
             return
-        with open(os.path.join(FOLDER_LOCAL.DOSSIER_CONTENUE_PDF,nom_fichier),"wb") as fichier:
-                fichier.write(page.encode("utf-8"))
+        with open(os.path.join(FOLDER_LOCAL.DOSSIER_CONTENUE_PDF,path_fichier),"wb") as fichier:
+                fichier.write(contenue.encode("utf-8"))
+    
+    def get_all_content_to_pdf(self): 
+            self.facture["date"] = self.get_date_achat(self.contenue_pdf)
+            self.facture["id"] = self.get_ID(self.contenue_pdf)
+            self.facture["provenance"] = self.provenance
+            self.facture["ttc"] = self.get_prix_ttc(self.contenue_pdf)
+    
+    def run_programme_model(self):
+        self.get_all_content_to_pdf()
+        self.f_date()
+        self.if_info_incomplete()
+        self.print_all_info()
+        self.formater_name_facture()
+        self.cree_fichier_texte_contenue_document()
+        self.trouver = True
+            

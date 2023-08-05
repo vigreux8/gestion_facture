@@ -1,10 +1,6 @@
 import os
 import re
-from Setting.CONSTANTE import FOLDER_LOCAL
-import importlib
-from datetime import datetime
 from fonctions.fonction_models_commun import facture_fonction_commun
-
 
 
 class ModelFacture(facture_fonction_commun):
@@ -20,26 +16,11 @@ class ModelFacture(facture_fonction_commun):
         self.pattern_provenance_siren = "IE6364992H"
         print(re.search(self.pattern_provenance_siren,self.contenue_pdf))
         self.get_contenue_pdf()
-        self.cree_fichier_texte_contenue_document(self.contenue_pdf)
-        self.run_programme()
-        
-        # print(self.infos_factures[0][1:len(self.infos_factures[0])])
-    def run_programme(self):
         if  self.pattern_provenance_siren in self.contenue_pdf:
-            self.get_all_content_to_pdf()
-            self.f_date()
-            self.if_info_incomplete()
-            self.print_all_info()
-            self.formater_name_facture()
-            self.trouver = True
+            self.run_programme_model()
         else:
             print(f"se n'ai pas une facture {self.provenance}")
-    def get_all_content_to_pdf(self): 
-            self.facture["date"] = self.get_date_achat(self.contenue_pdf)
-            self.facture["id"] = self.get_ID(self.contenue_pdf)
-            self.facture["provenance"] = self.provenance
-            self.facture["ttc"] = self.get_prix_ttc(self.contenue_pdf).replace(".",",")
-    
+        
     def get_ID(self,contenue):
         numero_commande = re.search(self.PATTERN_ID,contenue)
         if numero_commande:
