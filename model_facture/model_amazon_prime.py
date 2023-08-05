@@ -20,7 +20,6 @@ class ModelFacture(facture_fonction_commun):
         self.facture["path"] = path_facture_amazon_prime
         self.facture["name"] = os.path.basename(path_facture_amazon_prime) 
         self.PATTERN_ID = r"(\D\d{2}-\d{7}-\d{7}\D)"
-        self.PATTERN_COUT_TTC = r"TTC\s(.*?)(?=\s\|)"
         self.PATTERN_DATE =  r"\d{1,2}\s\w+\s\d{4}"
         self.PATTERN_DATE_ALTERNATIVE = r"Date de la commande (\d{1,2}\s\w+\.\s\d{4})"
         self.PATTERN_PRIX_TTC = r"Total à payer\s+EUR\s+(\d+\.\d{2})"
@@ -32,6 +31,7 @@ class ModelFacture(facture_fonction_commun):
         self.cree_fichier_texte_contenue_document(self.contenue_pdf)
         if  self.pattern_provenance_siren in self.contenue_pdf:
             self.get_all_content_to_pdf()
+            self.f_date()
             self.if_info_incomplete()
             self.print_all_info()
             self.formater_name_facture()
@@ -78,7 +78,7 @@ class ModelFacture(facture_fonction_commun):
     def get_prix_ttc(self,contenue):
         prix_total_TTC = re.search(self.PATTERN_PRIX_TTC,contenue)
         if prix_total_TTC:
-            return prix_total_TTC.group(1)
+            return prix_total_TTC.group(1).replace(".",",")
             # print("Prix :", prix_total_TTC)
         else:
             return None

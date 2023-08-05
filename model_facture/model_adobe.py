@@ -6,6 +6,8 @@ import importlib
 from datetime import datetime
 from fonction_commun import facture_fonction_commun
 
+
+
 class ModelFacture(facture_fonction_commun):
     def __init__(self,path_facture_amazon_prime) -> None:
         super().__init__()
@@ -17,7 +19,6 @@ class ModelFacture(facture_fonction_commun):
         self.facture["path"] = path_facture_amazon_prime
         self.facture["name"] = os.path.basename(path_facture_amazon_prime) 
         self.PATTERN_ID = r'Numéro de commande\s+(\d+)'
-        self.PATTERN_COUT_TTC = r"TTC\s(.*?)(?=\s\|)"
         self.PATTERN_DATE =  r"\b(\d{1,2}-[A-Z]{3}-\d{4})\b"
         self.PATTERN_PRIX_TTC = r"TOTAL\(EUR\)\s+(\d+\.\d{2})"
         self.pattern_provenance_siren = "IE6364992H"
@@ -27,6 +28,7 @@ class ModelFacture(facture_fonction_commun):
         self.cree_fichier_texte_contenue_document(self.contenue_pdf)
         if  self.pattern_provenance_siren in self.contenue_pdf:
             self.get_all_content_to_pdf()
+            self.f_date()
             self.if_info_incomplete()
             self.print_all_info()
             self.formater_name_facture()
@@ -34,7 +36,7 @@ class ModelFacture(facture_fonction_commun):
         else:
             print(f"se n'ai pas une facture {self.provenance}")
         # print(self.infos_factures[0][1:len(self.infos_factures[0])])
-     
+    
     def get_contenue_pdf(self):
         with open(self.facture["path"],"rb") as binarie_file:
             pdf_reader = PyPDF2.PdfReader(binarie_file)
@@ -45,7 +47,7 @@ class ModelFacture(facture_fonction_commun):
             self.facture["date"] = self.get_date_achat(self.contenue_pdf)
             self.facture["id"] = self.get_ID(self.contenue_pdf)
             self.facture["provenance"] = self.provenance
-            self.facture["ttc"] = self.get_prix_ttc(self.contenue_pdf)
+            self.facture["ttc"] = self.get_prix_ttc(self.contenue_pdf).replace(".",",")
     
     def get_ID(self,contenue):
         numero_commande = re.search(self.PATTERN_ID,contenue)

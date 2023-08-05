@@ -249,9 +249,10 @@ class MrSheets():
     def ecrire_apres_dernier_valeur_col(self,facture_info,colonne:str = "a",):
         index_ligne = self.get_last_value_col(colonne)[0]
         for key in list(self.info_associer_col):
-            self.feuille1.update(f"{self.info_associer_col[key]}{index_ligne+1}",facture_info[key])
-            if key == KEY_INFOMRATION.URL:
-                self.feuille1.update(f"{self.info_associer_col[key]}{index_ligne+1}",facture_info[key], raw=False)
+            self.feuille1.update(f"{self.info_associer_col[key]}{index_ligne+1}",facture_info[key], raw=False)
+            
+            # if key == KEY_INFOMRATION.URL:
+            #     self.feuille1.update(f"{self.info_associer_col[key]}{index_ligne+1}",facture_info[key], raw=False)
                 
     
     
@@ -319,7 +320,7 @@ class MrOrchestre():
                         id_facture = instance.facture['id']
                         cellule_url_id = '=HYPERLINK("{}"; "{}")'.format(google_url, id_facture)  #crée l'url
                         self.drive.drive_move_file_to_folder(instance.facture["google_id"],FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_ARCHIVER)
-                        facture_info_formater_sheet = self.formatage_info_a_ecrire_sheet(False,instance.facture['date'],instance.facture['ttc'],cellule_url_id,"",instance.facture['provenance'],"elies",False)
+                        facture_info_formater_sheet = self.formatage_info_a_ecrire_sheet("FALSE",instance.facture['date'],instance.facture['ttc'],cellule_url_id,"",instance.facture['provenance'],"elies",False)
                         self.sheet.ecrire_apres_dernier_valeur_col(facture_info_formater_sheet)
                         self.local.move_file(instance.facture["path"],FOLDER_LOCAL.FACTURE_ARCHIVER)
                     break

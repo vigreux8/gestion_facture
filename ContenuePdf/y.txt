@@ -1,0 +1,30 @@
+Adresse de facturation
+jean-baptiste Vigreux
+69100
+FRANCE
+Facture
+Détails des produits
+Validité: 27-JUL-2023 to 26-AOU-2023Données de facturation
+IEN2023035802811 Numéro de facture
+27-JUL-2023 Date de facturation
+Carte bancaire Cond. de paiement
+7109672990 Numéro de commande
+1263943030 Numéro de clientAE01473900100EFR Bon de commande
+EUR DeviseAdobe Systems Software Ireland Ltd
+4-6 Riverwalk
+Citywest Business Park
+Dublin 24
+Ireland
+Numéro de TVA: IE6364992H
+Page 1 sur 1 Nous vous remercions de votre confiance!Contact pour la facturation
+https://helpx.adobe.com/contact.htmlORIGINAL
+NUMÉRO DE PRODUIT DESCRIPTION DU PRODUIT QUANTITÉ UNITÉ PRIX UNITAIRE MONTANT NET TAUX TVA TAXES TOTAL
+65207466 Tout Creative Cloud 100 Go 1EA 16.25 16.25 20.00% 3.25 19.50
+TOTAL FACTURÉ
+MONTANT NET(EUR) 16.25
+TAXES (VOIR DÉTAIL DES TAUX) 3.25
+TVA
+TOTAL(EUR) 19.50
+Commentaires:
+http://www.adobe.com/support/service/
+TVA

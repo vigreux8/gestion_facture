@@ -1,9 +1,32 @@
 import os 
-from Setting.CONSTANTE import FOLDER_LOCAL
+from Setting.CONSTANTE import FOLDER_LOCAL,MOIS_TRADUCTION
+from datetime import datetime
+from dateutil.parser import parse
 
 class facture_fonction_commun():
     def __init__(self) -> None:
         self.message_erreur_info_incomplete = "InfoManquante"
+    
+    
+    def f_date(self):
+        #si le format de la date n'ai pas JJ/MM/YYYY
+        facture_date = self.facture['date']
+        try:
+            date_obj = parse(facture_date)
+            date_obj = date_obj.strftime('%d/%m/%Y')
+            self.facture["date"] = date_obj
+        except:
+            try:
+                for mois in list(MOIS_TRADUCTION.MOIS_TRADUCTION_FR_TO_ANGLAIS):
+                    if mois in facture_date:
+                        facture_date = facture_date.replace(mois,MOIS_TRADUCTION.MOIS_TRADUCTION_FR_TO_ANGLAIS[mois])
+                        break
+                date_obj = parse(facture_date)
+                date_obj = date_obj.strftime('%d/%m/%Y')
+                self.facture["date"] = date_obj
+            except ValueError as error:
+                print("An error occurred:", str(error))
+    
     
     def if_info_incomplete(self):
         key_none = []
@@ -29,10 +52,14 @@ class facture_fonction_commun():
         #si message erreur donner manquante
         if self.facture["id"] == self.message_erreur_info_incomplete:
             patch_new = os.path.join(FOLDER_LOCAL.FACTURE_INFO_MANQUANTE,new_nom_fichier)
+            self.facture["name"] = os.path.basename(patch_new)
         else:
-            patch_new = os.path.join(repertoir_parent,new_nom_fichier)
+            self.facture["path"]= patch_new = os.path.join(repertoir_parent,new_nom_fichier)
+            self.facture["name"] = os.path.basename(patch_new)
+
         
         os.rename(path_original,patch_new)
+        
     
     def cree_fichier_texte_contenue_document(self,page,nom_fichier = ""):
         chemin_dossier = FOLDER_LOCAL.DOSSIER_CONTENUE_PDF

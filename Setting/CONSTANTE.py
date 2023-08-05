@@ -41,3 +41,19 @@ class KEY_INFOMRATION():
     PROVENANCE = "provenance"
     PERSONNE = "personne"
     REMBOURSER = "rembourser"
+
+class MOIS_TRADUCTION():
+    MOIS_TRADUCTION_FR_TO_ANGLAIS = {
+    "janvier": "january",
+    "février": "february",
+    "mars": "march",
+    "avril": "april",
+    "mai": "may",
+    "juin": "june",
+    "juillet": "july",
+    "août": "august",
+    "septembre": "september",
+    "octobre": "october",
+    "novembre": "november",
+    "décembre": "december"
+}

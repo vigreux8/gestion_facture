@@ -25,11 +25,13 @@ class ModelFacture(facture_fonction_commun):
         self.get_contenue_pdf()
         self.cree_fichier_texte_contenue_document(self.contenue_pdf)
         if  self.pattern_provenance_siren in self.contenue_pdf:
-            self.trouver = True
             self.get_all_content_to_pdf()
+            self.f_date()
             self.if_info_incomplete()
             self.print_all_info()
             self.formater_name_facture()
+            self.trouver = True
+            
             
             
         else:
@@ -64,7 +66,7 @@ class ModelFacture(facture_fonction_commun):
         date_commande = re.search(self.PATTERN_DATE,contenue)
 
         if date_commande:
-            return str(date_commande.group(0))
+            return  str(date_commande.group(0))
             # print("Date :", self.DATE_ACHAT)
         else:
             return None
@@ -73,7 +75,7 @@ class ModelFacture(facture_fonction_commun):
     def get_prix_ttc(self,contenue):
         prix_total_TTC = re.search(self.PATTERN_PRIX_TTC,contenue)
         if prix_total_TTC:
-            return prix_total_TTC.group(1).replace(",",".")
+            return prix_total_TTC.group(1)
             # print("Prix :", prix_total_TTC)
         else:
             return None
