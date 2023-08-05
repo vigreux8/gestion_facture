@@ -177,14 +177,29 @@ class MrDrive:
         self.key_connexion = key_connecte_google_drive
         self.drive = GoogleDrive(key_connecte_google_drive)
 
+    @staticmethod
+    def formatage_name_before_upload(id_dossier_destionation,facture):
+        facture_formater = {
+            "id": id_dossier_destionation,
+            "name" : os.path.basename(facture),
+            "path" : facture
+            
+        }
+        return facture_formater
+        
+    
     def upload_local_to_drive(self,id_dossier_destionation,facture_local ):
-            drive_facture_traiter = self.drive.CreateFile(
-            {
-            'parents': [{'id': id_dossier_destionation}],
-            "title" : facture_local["name"]
-            })
-            drive_facture_traiter.SetContentFile(facture_local["path"])
-            drive_facture_traiter.Upload()
+        if not isinstance(facture_local,dict):
+            facture_local = self.formatage_name_before_upload(id_dossier_destionation,facture_local)
+
+        drive_facture_traiter = self.drive.CreateFile(
+        {
+        'parents': [{'id': id_dossier_destionation}],
+        "title" : facture_local["name"]
+        })
+            
+        drive_facture_traiter.SetContentFile(facture_local["path"])
+        drive_facture_traiter.Upload()
     
 class MrSheets():
     def __init__(self,compte_mail_json=GOOGLE_AUTH.KEY_MAILS_AUTH,file_sheets=FOLDER_GOOGLESHEET.FACTURE,feuille="Feuille1") -> None:
@@ -270,6 +285,10 @@ class MrOrchestre():
             KEY_INFOMRATION.REMBOURSER: rembourser}  
         return info_facture_dict  
     
+    def move_folder_archiver(self,path):
+        self.local.move_file(path,FOLDER_LOCAL.FACTURE_ARCHIVER)
+        
+        
     #gerer les doublons dans sheets
     def main_constructor(self):
         #gestion_erreur
@@ -280,6 +299,8 @@ class MrOrchestre():
         for path_facture in list_facture_pas_traiter:
             for template_facture in self.local.list_template_factures:  
                 instance =  template_facture(path_facture)
+                
+                #fonction instance 
                 if instance.trouver:
                     list_id_sheet = []
                     #upload fichier + information
@@ -309,7 +330,9 @@ class MrOrchestre():
             for path_facture in list_element_inconnue:
                 index = str(len(os.listdir(FOLDER_LOCAL.FACTURE_INCONNUE)))
                 path_facture = self.formater_name_file(path_facture,index)
+                self.drive.upload_local_to_drive(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_INCONNUE,path_facture)
                 self.local.move_file(path_facture,FOLDER_LOCAL.FACTURE_INCONNUE)
+                
         
         #fonction upload   
             #[]upload donner manquante dans drive :  DOSSIER_local,patch_fichier,ID_dossier_drive
