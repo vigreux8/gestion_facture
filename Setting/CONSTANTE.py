@@ -1,5 +1,23 @@
 import os
 
+
+class KEY_FACTURE():
+    NOM_FICHIER = "name"
+    LOCAL_PATH = 'path'
+    DATE = 'date'
+    PROVENANCE = 'provenance'
+    TTC = "ttc"
+    ID = 'id'
+    ID_GOOGLE = 'google_id'
+    URL_GOOGLE = 'google_url'
+    ID_FOLDER = 'google_folder_id'
+    
+class OPTION_SHEET:
+    POSITION_NOM_COLONNE = 1
+    
+class OPTION_LOCAL:
+    SEPARATEUR = "_"
+
 class FOLDER_LOCAL():
     DOSSIER_FACTURE = "facture"
     DOSSIER_CONTENUE_PDF = "ContenuePdf"
@@ -29,8 +47,8 @@ class FOLDER_GOOGLESHEET():
 class FOLDER_GOOGLEDRIVE():
     ID_DOSSIER_FACTURE_ARCHIVER = "1y27_FsNR0PRaxNz564CI27L_jK1sZnFp"
     ID_DOSSIER_FACTURE_INCONNUE = "1xrYm-Wo_8jpvbfo3srmdMdsds1mptfXL"
-    ID_DOSSIER_FACTURE_EN_COURS = "1fbgY3MimnRgRk6MqxTt23AKIqegz7pCC"
     ID_DOSSIER_FACTURE_TAMPON = "1TznVt-En12t2TEmU0NDsUxJ8k6G2tUv4"
+    ID_DOSSIER_FACTURE_DONNER_MANQUANTE = "17liWRmuGIvEHtHS6cJT__MGVmJ1PYcvK"
     
 class KEY_INFOMRATION():
     CONTROLLER = "controller"

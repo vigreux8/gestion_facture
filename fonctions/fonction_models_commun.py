@@ -1,14 +1,27 @@
 import os 
-from Setting.CONSTANTE import FOLDER_LOCAL,MOIS_TRADUCTION
+from Setting.CONSTANTE import FOLDER_LOCAL,MOIS_TRADUCTION,OPTION_LOCAL
 from datetime import datetime
 from dateutil.parser import parse
+import PyPDF2
+
 
 class facture_fonction_commun():
     def __init__(self) -> None:
         self.message_erreur_info_incomplete = "InfoManquante"
-    
-    
+        self.facture = {}
+        self.donner_manquante = False
+        self.trouver = False
+        self.contenue_pdf = ""
+        self.separateur_rename = OPTION_LOCAL.SEPARATEUR
+      
+    def get_contenue_pdf(self):
+        with open(self.facture["path"],"rb") as binarie_file:
+            pdf_reader = PyPDF2.PdfReader(binarie_file)
+            first_page = pdf_reader.pages[0]
+            self.contenue_pdf = first_page.extract_text()
+            
     def f_date(self):
+        #F pour format date 
         #si le format de la date n'ai pas JJ/MM/YYYY
         facture_date = self.facture['date']
         try:
@@ -36,6 +49,7 @@ class facture_fonction_commun():
         if key_none:        
             self.message_erreur_info_incomplete ="_".join((self.message_erreur_info_incomplete,f"{key}")) 
             self.facture["id"] = self.message_erreur_info_incomplete
+            self.donner_manquante = True
     
     def print_all_info(self):
         # for key in list(self.facture):
@@ -47,20 +61,16 @@ class facture_fonction_commun():
         path_original = self.facture["path"]
         extension = os.path.splitext(path_original)[-1]
         repertoir_parent = os.path.dirname(path_original)
-        separateur = "_"
-        new_nom_fichier = separateur.join([self.provenance,f"{self.facture['id']}{extension}"])
+        new_nom_fichier = self.separateur_rename.join([self.provenance,f"{self.facture['id']}{extension}"])
         #si message erreur donner manquante
         if self.facture["id"] == self.message_erreur_info_incomplete:
-            patch_new = os.path.join(FOLDER_LOCAL.FACTURE_INFO_MANQUANTE,new_nom_fichier)
-            self.facture["name"] = os.path.basename(patch_new)
+            self.facture["path"] = os.path.join(FOLDER_LOCAL.FACTURE_INFO_MANQUANTE,new_nom_fichier)
+            self.facture["name"] = os.path.basename(self.facture["path"])
         else:
-            self.facture["path"]= patch_new = os.path.join(repertoir_parent,new_nom_fichier)
-            self.facture["name"] = os.path.basename(patch_new)
-
-        
-        os.rename(path_original,patch_new)
-        
-    
+            self.facture["path"] = os.path.join(repertoir_parent,new_nom_fichier)
+            self.facture["name"] = os.path.basename(self.facture["path"])
+        os.rename(path_original,self.facture["path"])
+           
     def cree_fichier_texte_contenue_document(self,page,nom_fichier = ""):
         chemin_dossier = FOLDER_LOCAL.DOSSIER_CONTENUE_PDF
         extension = ".txt"
