@@ -1,27 +1,29 @@
 import os
-import PyPDF2
 import re
 from Setting.CONSTANTE import FOLDER_LOCAL
 import importlib
+from datetime import datetime
 from fonctions.fonction_models_commun import facture_fonction_commun
+
 
 
 class ModelFacture(facture_fonction_commun):
     def __init__(self,path_facture) -> None:
         super().__init__()
-        self.provenance = "AmazonProduit"
+        self.provenance = "Adobe"
         print(f"instance : {self.provenance} active")
         self.facture["path"] = path_facture
         self.facture["name"] = os.path.basename(path_facture) 
-        self.PATTERN_ID = r"Numéro de la commande ([\d-]+)"
-        self.PATTERN_DATE =  r"(\d{2}\.\d{2}\.\d{3})"
-        self.PATTERN_PRIX_TTC = r"Total à payer (\d+\,\d{2}) €"
-        self.pattern_provenance_siren = "R.C.S. Luxembourg: B 93815"
+        self.PATTERN_ID = "insérer REGEX"
+        self.PATTERN_DATE = "insérer REGEX" 
+        self.PATTERN_PRIX_TTC = "insérer REGEX"
+        self.pattern_provenance_siren = "siret_entreprise"
         print(re.search(self.pattern_provenance_siren,self.contenue_pdf))
         self.get_contenue_pdf()
         self.cree_fichier_texte_contenue_document(self.contenue_pdf)
         self.run_programme()
-    
+        
+        # print(self.infos_factures[0][1:len(self.infos_factures[0])])
     def run_programme(self):
         if  self.pattern_provenance_siren in self.contenue_pdf:
             self.get_all_content_to_pdf()
@@ -32,13 +34,12 @@ class ModelFacture(facture_fonction_commun):
             self.trouver = True
         else:
             print(f"se n'ai pas une facture {self.provenance}")
-    
     def get_all_content_to_pdf(self): 
             self.facture["date"] = self.get_date_achat(self.contenue_pdf)
             self.facture["id"] = self.get_ID(self.contenue_pdf)
             self.facture["provenance"] = self.provenance
-            self.facture["ttc"] = self.get_prix_ttc(self.contenue_pdf)
-
+            self.facture["ttc"] = self.get_prix_ttc(self.contenue_pdf).replace(".",",")
+    
     def get_ID(self,contenue):
         numero_commande = re.search(self.PATTERN_ID,contenue)
         if numero_commande:
@@ -55,11 +56,11 @@ class ModelFacture(facture_fonction_commun):
         date_commande = re.search(self.PATTERN_DATE,contenue)
 
         if date_commande:
-            return  str(date_commande.group(0))
+                return str(date_commande.group(0))
             # print("Date :", self.DATE_ACHAT)
+                # print("Aucune date trouvée.")
         else:
             return None
-                # print("Aucune date trouvée.")
 
     def get_prix_ttc(self,contenue):
         prix_total_TTC = re.search(self.PATTERN_PRIX_TTC,contenue)
@@ -69,11 +70,11 @@ class ModelFacture(facture_fonction_commun):
         else:
             return None
             # print("Aucun prix trouvé.")
+        
 
-#comment faire pour avoir un template de model
 def main_test():
     chem_facture =  os.path.join("facture","pas traiter","adobe.pdf")
     facture = ModelFacture(chem_facture)
-      
+        
 # main_test()
         
