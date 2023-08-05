@@ -118,6 +118,8 @@ class facture_fonction_commun():
             self.facture["id"] = self.get_ID(self.contenue_pdf_byte)
             self.facture["provenance"] = self.provenance
             self.facture["ttc"] = self.get_prix_ttc(self.contenue_pdf_byte)
+            if self.facture["ttc"]:
+                self.facture["ttc"] = self.facture["ttc"].replace(".",",")
     
     def run_programme_model(self):
         self.trouver = True

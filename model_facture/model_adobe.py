@@ -14,9 +14,6 @@ class ModelFacture(facture_fonction_commun):
         print(f"instance : {self.provenance} active")
         self.facture["path"] = path_facture_amazon_prime
         self.facture["name"] = os.path.basename(path_facture_amazon_prime) 
-        
-        
-        print(re.search(self.pattern_provenance_siren,self.contenue_pdf_byte))
         self.get_contenue_pdf()
         if  self.pattern_provenance_siren in self.contenue_pdf_byte:
             self.run_programme_model()
@@ -48,7 +45,7 @@ class ModelFacture(facture_fonction_commun):
     def get_prix_ttc(self,contenue):
         prix_total_TTC = re.search(self.PATTERN_PRIX_TTC,contenue)
         if prix_total_TTC:
-            return prix_total_TTC.group(1)
+            return str(prix_total_TTC.group(1))
             # print("Prix :", prix_total_TTC)
         else:
             return None

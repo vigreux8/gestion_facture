@@ -12,7 +12,7 @@ class ModelFacture(facture_fonction_commun):
         self.facture["name"] = os.path.basename(path_facture) 
         self.PATTERN_ID = r"Numéro de la commande ([\d-]+)"
         self.PATTERN_DATE =  r"(\d{2}\.\d{2}\.\d{3})"
-        self.PATTERN_PRIX_TTC = r"Total à payer (\d+\,\d{1}) €"
+        self.PATTERN_PRIX_TTC = r"\d{1,2},\d{2} €"
         self.pattern_provenance_siren = "R.C.S. Luxembourg: B 93815"
         self.get_contenue_pdf()
         if  self.pattern_provenance_siren in self.contenue_pdf_byte:
@@ -45,7 +45,7 @@ class ModelFacture(facture_fonction_commun):
     def get_prix_ttc(self,contenue):
         prix_total_TTC = re.search(self.PATTERN_PRIX_TTC,contenue)
         if prix_total_TTC:
-            return prix_total_TTC.group(1)
+            return str(prix_total_TTC.group(0))
             # print("Prix :", prix_total_TTC)
         else:
             return None

@@ -48,7 +48,7 @@ class ModelFacture(facture_fonction_commun):
     def get_prix_ttc(self,contenue):
         prix_total_TTC = re.search(self.PATTERN_PRIX_TTC,contenue)
         if prix_total_TTC:
-            return prix_total_TTC.group(1).replace(".",",")
+            return str(prix_total_TTC.group(1))
             # print("Prix :", prix_total_TTC)
         else:
             return None
