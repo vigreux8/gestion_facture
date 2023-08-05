@@ -269,27 +269,28 @@ class MrOrchestre():
             KEY_INFOMRATION.PERSONNE: personne,
             KEY_INFOMRATION.REMBOURSER: rembourser}  
         return info_facture_dict  
+    
+    #gerer les doublons dans sheets
     def main_constructor(self):
         #gestion_erreur
         list_facture_pas_traiter =  self.local.listdir_path_complet_sans_pycache(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
         list_element_inconnue = list_facture_pas_traiter.copy()
-        index_id_sheet = self.sheet.get_id_facture_index_col_dict()
         #[]recuperais id present dans le sheets
         
         for path_facture in list_facture_pas_traiter:
-            for template_facture in self.local.list_template_factures:
+            for template_facture in self.local.list_template_factures:  
                 instance =  template_facture(path_facture)
                 if instance.trouver:
                     list_id_sheet = []
                     #upload fichier + information
                     list_element_inconnue.remove(path_facture)
                     #[] si id instance present dans id sheets deplacer dans archiver_local
-                    for cellule in index_id_sheet:
+                    for cellule in self.sheet.get_id_facture_index_col_dict():
                          list_id_sheet.append(cellule["id"])
                          
-                    if cellule["id"] in instance.facture["id"]:
-                            self.local.move_file(instance.facture["path"],FOLDER_LOCAL.FACTURE_ARCHIVER)
-                            
+                    if instance.facture["id"] in list_id_sheet:
+                        self.local.move_file(instance.facture["path"],FOLDER_LOCAL.FACTURE_ARCHIVER)
+                           
                     else:
                         self.drive.upload_local_to_drive(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_TAMPON,instance.facture)
                         instance.facture = {**instance.facture,**self.drive.get_all_file_drive_folder(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_TAMPON)}
@@ -299,11 +300,10 @@ class MrOrchestre():
                         self.drive.drive_move_file_to_folder(instance.facture["google_id"],FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_ARCHIVER)
                         facture_info_formater_sheet = self.formatage_info_a_ecrire_sheet(False,instance.facture['date'],instance.facture['ttc'],cellule_url_id,"",instance.facture['provenance'],"elies",False)
                         self.sheet.ecrire_apres_dernier_valeur_col(facture_info_formater_sheet)
+                        self.local.move_file(instance.facture["path"],FOLDER_LOCAL.FACTURE_ARCHIVER)
                     break
 
                     #[] upload le fichier dans id_dossier_drive_en_cours
-                    
-                    break
         list_file_drive =  self.drive.get_all_file_drive_folder(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_EN_COURS)
         if list_element_inconnue:
             for path_facture in list_element_inconnue:

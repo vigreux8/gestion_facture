@@ -5,7 +5,6 @@ from Setting.CONSTANTE import FOLDER_LOCAL
 import importlib
 from fonction_commun import facture_fonction_commun
 
-#comment savoir que j'ai tester tout les models ? 
 
 class ModelFacture(facture_fonction_commun):
     def __init__(self,path_facture) -> None:
