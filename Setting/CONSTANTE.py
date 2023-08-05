@@ -28,8 +28,8 @@ class FOLDER_LOCAL():
     FACTURE_ARCHIVER = os.path.join(".",DOSSIER_FACTURE,"archiver")
     FACTURE_INFO_MANQUANTE= os.path.join(".",DOSSIER_FACTURE,"info_manquante")
     FACTURE_INCONNUE= os.path.join(".",DOSSIER_FACTURE,"inconnue")
-    
     MODEL_FACTURE = os.path.join(".",DOSSIER_MODEL_FACTURE)
+    PROMPT_GPT = os.path.join(".",DOSSIER_CONTENUE_PDF,"prompt_gpt")
     
     
 

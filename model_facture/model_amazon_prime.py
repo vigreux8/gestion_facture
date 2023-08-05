@@ -17,7 +17,7 @@ class ModelFacture(facture_fonction_commun):
         self.PATTERN_PRIX_TTC = r"Total à payer\s+EUR\s+(\d+\.\d{2})"
         self.pattern_provenance_siren = "487773327 • RCS Nanterre"
         self.get_contenue_pdf()
-        if  self.pattern_provenance_siren in self.contenue_pdf:
+        if  self.pattern_provenance_siren in self.contenue_pdf_byte:
             self.run_programme_model()
         else:
             print(f"se n'ai pas une facture {self.provenance}")

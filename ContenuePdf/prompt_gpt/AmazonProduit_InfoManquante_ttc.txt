@@ -1,4 +1,5 @@
-Facture
+voici une facture garde la en memoire et repond uniquement "OK je suis pret a prendre les consigne" n écrire rien d autre
+    facture :"Facture
 Nos prix des équipements électriques et électroniques incluent l'éco-participation, conformément à l’article L. 541-10-2 du code de l'environnement. 
 LU-BIO-04 
 Amazon Services Europe S.à r.l., 38 avenue John F. Kennedy, L-1855, Luxembourg 
@@ -46,4 +47,23 @@ meubles Démonter et installer des voitures. | B085DB6QSZ
 Information indisponible sur les pièces détachées  
 ASIN: B085DB6QSZ1 15,82 € 20 % 18,99 € 18,99 €
 Livraison 0,00 € 0,00 € 0,00 €
-Remise -0,79 € -0,95 € -0,95 €
+Remise -0,79 € -0,95 € -0,95 €"
+
+
+    voici tes consignes a partir du pdf fournie et tu dois parfaitement les respecter :
+    tu peux créer le regex
+    installe-le ensuite dans un fichier que je peux copier (n indique pas de commentaires en # mais les variables à la suite et n explique rien)
+    CONSIGNE IMPORTANT:
+    -le prix doit être uniquement composer de valeur numerique separer par une virgule
+    -la date doit se composer uniquement de la date et rien d'autre 
+    self.PATTERN_ID = r"ici patern regex pour trouver le numéro de facture l id doit être unique à chaque facture"
+    self.PATTERN_DATE = r"ici paterne date"
+    self.PATTERN_PRIX_TTC = r"ici paterne regex du prix TTC"
+    identifiant_unique = "ressort le numéro de TVA ou le SIREN ou SIRET ou l adresse de l entreprise surtout pas un numero commande ou idenfiant semblable a l'id"
+
+    afficher les resultat attendu dans ton encadre chatgpt :
+
+    1. Identifiant de la facture : []
+    2. Date de la facture : []
+    3. Prix total TTC : []
+    4. Identifiant unique : [] 

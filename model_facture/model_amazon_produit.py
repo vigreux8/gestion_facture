@@ -12,10 +12,10 @@ class ModelFacture(facture_fonction_commun):
         self.facture["name"] = os.path.basename(path_facture) 
         self.PATTERN_ID = r"Numéro de la commande ([\d-]+)"
         self.PATTERN_DATE =  r"(\d{2}\.\d{2}\.\d{3})"
-        self.PATTERN_PRIX_TTC = r"Total à payer (\d+\,\d{2}) €"
+        self.PATTERN_PRIX_TTC = r"Total à payer (\d+\,\d{1}) €"
         self.pattern_provenance_siren = "R.C.S. Luxembourg: B 93815"
         self.get_contenue_pdf()
-        if  self.pattern_provenance_siren in self.contenue_pdf:
+        if  self.pattern_provenance_siren in self.contenue_pdf_byte:
             self.run_programme_model()
         else:
             print(f"se n'ai pas une facture {self.provenance}")

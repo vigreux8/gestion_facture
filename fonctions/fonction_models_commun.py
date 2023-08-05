@@ -6,25 +6,24 @@ import PyPDF2
 
 
 class facture_fonction_commun():
-    def __init__(self) -> None:
+    def __init__(self,path=None) -> None:
         self.message_erreur_info_incomplete = "InfoManquante"
-        self.facture = {}
+        self.facture = {
+            "path" : path
+        }
         self.donner_manquante = False
         self.trouver = False
-        self.contenue_pdf = ""
+        self.contenue_pdf_byte = None
+        self.contenue_pdf_str = None
+        
+        
         self.separateur_rename = OPTION_LOCAL.SEPARATEUR
       
-    def get_contenue_pdf(self,path = None ):
-        if not path:
-            with open(self.facture["path"],"rb") as binarie_file:
-                pdf_reader = PyPDF2.PdfReader(binarie_file)
-                first_page = pdf_reader.pages[0]
-                self.contenue_pdf = first_page.extract_text()
-        else:
-            with open(path,"rb") as binarie_file:
-                pdf_reader = PyPDF2.PdfReader(binarie_file)
-                first_page = pdf_reader.pages[0]
-            return first_page.extract_text()
+    def get_contenue_pdf(self ):
+        with open(self.facture["path"],"rb") as binarie_file:
+            pdf_reader = PyPDF2.PdfReader(binarie_file)
+            first_page = pdf_reader.pages[0]
+            self.contenue_pdf_byte = first_page.extract_text()
             
     def f_date(self):
         facture_date = self.facture['date']
@@ -74,38 +73,58 @@ class facture_fonction_commun():
             self.facture["name"] = os.path.basename(self.facture["path"])
         os.rename(path_original,self.facture["path"])
            
-    def cree_fichier_texte_contenue_document(self,path_fichier = None):
+    def cree_fichier_texte_prompt_document(self):
+        self.get_contenue_pdf()
         chemin_dossier = FOLDER_LOCAL.DOSSIER_CONTENUE_PDF
         extension = ".txt"
-        if path_fichier:
-            path_fichier = os.path.basename(self.facture["path"])
-            path_fichier = f"{path_fichier}{extension}"
-            contenue = self.contenue_pdf
-        else:
-            nom_fichier = os.path.basename(path_fichier)
-            contenue = self.get_contenue_pdf(path_fichier)
-            nom_fichier = f"{nom_fichier}{extension}"
+        nom_fichier = os.path.basename(self.facture["path"]).replace(".pdf","")
+        nom_fichier = f"{nom_fichier}{extension}"
+        contenue = self.contenue_pdf_byte
         
-        chemins_fichier = os.path.join(FOLDER_LOCAL.DOSSIER_CONTENUE_PDF,path_fichier)
-        
+        chemins_fichier = os.path.join(FOLDER_LOCAL.DOSSIER_CONTENUE_PDF,nom_fichier)
         if  os.path.exists(chemins_fichier):
             print("fichier déjat existant")
             return
-        with open(os.path.join(FOLDER_LOCAL.DOSSIER_CONTENUE_PDF,path_fichier),"wb") as fichier:
-                fichier.write(contenue.encode("utf-8"))
-    
+        if not self.trouver or self.donner_manquante:
+            with open(os.path.join(FOLDER_LOCAL.PROMPT_GPT,nom_fichier),"w",encoding="utf-8") as fichier:
+                    fichier.write(f"""voici une facture garde la en memoire et repond uniquement "OK je suis pret a prendre les consigne" n écrire rien d autre
+    facture :"{contenue}"
+
+
+    voici tes consignes a partir du pdf fournie et tu dois parfaitement les respecter :
+    tu peux créer le regex
+    installe-le ensuite dans un fichier que je peux copier (n indique pas de commentaires en # mais les variables à la suite et n explique rien)
+    CONSIGNE IMPORTANT:
+    -le prix doit être uniquement composer de valeur numerique separer par une virgule
+    -la date doit se composer uniquement de la date et rien d'autre 
+    self.PATTERN_ID = r"ici patern regex pour trouver le numéro de facture l id doit être unique à chaque facture"
+    self.PATTERN_DATE = r"ici paterne date"
+    self.PATTERN_PRIX_TTC = r"ici paterne regex du prix TTC"
+    identifiant_unique = "ressort le numéro de TVA ou le SIREN ou SIRET ou l adresse de l entreprise surtout pas un numero commande ou idenfiant semblable a l'id"
+
+    afficher les resultat attendu dans ton encadre chatgpt :
+
+    1. Identifiant de la facture : []
+    2. Date de la facture : []
+    3. Prix total TTC : []
+    4. Identifiant unique : [] """
+
+    )
+        else:
+            with open(os.path.join(FOLDER_LOCAL.DOSSIER_CONTENUE_PDF,nom_fichier),"w",encoding="utf-8") as fichier:
+                    fichier.write(contenue)
     def get_all_content_to_pdf(self): 
-            self.facture["date"] = self.get_date_achat(self.contenue_pdf)
-            self.facture["id"] = self.get_ID(self.contenue_pdf)
+            self.facture["date"] = self.get_date_achat(self.contenue_pdf_byte)
+            self.facture["id"] = self.get_ID(self.contenue_pdf_byte)
             self.facture["provenance"] = self.provenance
-            self.facture["ttc"] = self.get_prix_ttc(self.contenue_pdf)
+            self.facture["ttc"] = self.get_prix_ttc(self.contenue_pdf_byte)
     
     def run_programme_model(self):
+        self.trouver = True
         self.get_all_content_to_pdf()
         self.f_date()
         self.if_info_incomplete()
         self.print_all_info()
         self.formater_name_facture()
-        self.cree_fichier_texte_contenue_document()
-        self.trouver = True
+        self.cree_fichier_texte_prompt_document()
             

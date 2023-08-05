@@ -5,13 +5,10 @@ import gspread
 import os
 from Setting.CONSTANTE import *
 import shutil
-import google.auth
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-import PyPDF2
-import re
 import importlib
-import inspect
+from fonctions.fonction_models_commun import facture_fonction_commun as fc
 #creation prompt automatique pour recupere les patterne
 #upload fichier_donner_manquante
 
@@ -287,6 +284,8 @@ class MrOrchestre():
             for path_facture in list_element_inconnue:
                 index = str(len(os.listdir(FOLDER_LOCAL.FACTURE_INCONNUE)))
                 path_facture = self.formater_name_file(path_facture,index)
+                instance =  fc(path_facture)
+                instance.cree_fichier_texte_prompt_document()
                 self.drive.upload_local_to_drive(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_INCONNUE,path_facture)
                 self.local.move_file(path_facture,FOLDER_LOCAL.FACTURE_INCONNUE)
         

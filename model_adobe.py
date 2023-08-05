@@ -6,17 +6,19 @@ from fonctions.fonction_models_commun import facture_fonction_commun
 class ModelFacture(facture_fonction_commun):
     def __init__(self,path_facture_amazon_prime) -> None:
         super().__init__()
-        self.provenance = "Adobe"
-        print(f"instance : {self.provenance} active")
-        self.facture["path"] = path_facture_amazon_prime
-        self.facture["name"] = os.path.basename(path_facture_amazon_prime) 
         self.PATTERN_ID = r'Numéro de commande\s+(\d+)'
         self.PATTERN_DATE =  r"\b(\d{1,2}-[A-Z]{3}-\d{4})\b"
         self.PATTERN_PRIX_TTC = r"TOTAL\(EUR\)\s+(\d+\.\d{2})"
         self.pattern_provenance_siren = "IE6364992H"
-        print(re.search(self.pattern_provenance_siren,self.contenue_pdf))
+        self.provenance = "Adobe"
+        print(f"instance : {self.provenance} active")
+        self.facture["path"] = path_facture_amazon_prime
+        self.facture["name"] = os.path.basename(path_facture_amazon_prime) 
+        
+        
+        print(re.search(self.pattern_provenance_siren,self.contenue_pdf_byte))
         self.get_contenue_pdf()
-        if  self.pattern_provenance_siren in self.contenue_pdf:
+        if  self.pattern_provenance_siren in self.contenue_pdf_byte:
             self.run_programme_model()
         else:
             print(f"se n'ai pas une facture {self.provenance}")
