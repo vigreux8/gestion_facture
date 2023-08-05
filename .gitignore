@@ -1,4 +1,4 @@
-.env
+.venv
 amazon_prime
 amazon
 test_google_apy.py
