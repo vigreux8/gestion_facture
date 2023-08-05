@@ -7,3 +7,4 @@ client_secrets.json
 service_account.json
 token_refresh.json
 prime_D01-3598561-0389456.pdf
+__pycache__

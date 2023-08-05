@@ -12,6 +12,12 @@ import PyPDF2
 import re
 import importlib
 import inspect
+#refactoriser code, crée le main, ranger les documents
+#creation prompt automatique pour recupere les patterne
+#upload fichier_donner_manquante
+
+#rendre maintenable et personalsier l'écriture dans un fichier exels
+#envoie un mails si facture inconnue ? 
 
 class MrLocal:
     def __init__(self) -> None:
@@ -368,8 +374,7 @@ class MrOrchestre():
         os.rename(path_original,patch_new)
         return patch_new
 
-main = MrOrchestre()
-main.main_constructor()
+
 
 # main_sheet = MrSheets()
 # main_sheet.main_constructeur()

@@ -3,7 +3,7 @@ import PyPDF2
 import re
 from Setting.CONSTANTE import FOLDER_LOCAL
 import importlib
-from fonction_commun import facture_fonction_commun
+from fonctions.fonction_commun import facture_fonction_commun
 
 
 class ModelFacture(facture_fonction_commun):
