@@ -13,6 +13,7 @@ class facture_fonction_commun():
         }
         self.donner_manquante = False
         self.trouver = False
+        self.test = False
         self.contenue_pdf_byte = None
         self.contenue_pdf_str = None
         
@@ -84,7 +85,7 @@ class facture_fonction_commun():
         if  os.path.exists(chemins_fichier):
             print("fichier déjat existant")
             return
-        if not self.trouver or self.donner_manquante:
+        if not self.trouver or self.donner_manquante or self.test:
             with open(os.path.join(FOLDER_LOCAL.PROMPT_GPT,nom_fichier),"w",encoding="utf-8") as fichier:
                     fichier.write(f"""voici une facture garde la en memoire et repond uniquement "OK je suis pret a prendre les consigne" n écrire rien d autre
     facture :"{contenue}"
@@ -129,4 +130,15 @@ class facture_fonction_commun():
             self.print_all_info()
         self.formater_name_facture()
         self.cree_fichier_texte_prompt_document()
-            
+        
+    @classmethod
+    def Test_facture(self) -> str: 
+        """retourne la facture present dnas le dossier test"""
+        if len(os.listdir(FOLDER_LOCAL.FACTURE_TEST)) == 1:
+            nom_fichier =  os.listdir(FOLDER_LOCAL.FACTURE_TEST)[0]
+            path_fichier = os.path.join(FOLDER_LOCAL.FACTURE_TEST,nom_fichier)
+            return path_fichier
+        elif len(os.listdir(FOLDER_LOCAL.FACTURE_TEST)) >= 1:
+            print("le dossier test doit contenir 1 seul fichier ")
+        else:
+            print("fichier vide")

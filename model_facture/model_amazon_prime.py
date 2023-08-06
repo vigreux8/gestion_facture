@@ -54,16 +54,5 @@ class ModelFacture(facture_fonction_commun):
             return None
             # print("Aucun prix trouvé.")
 
-    @classmethod
-    def Test_facture(self) -> object: 
-        """retourne la facture present dnas le dossier test"""
-        if len(os.listdir(FOLDER_LOCAL.FACTURE_TEST)) == 1:
-            nom_fichier =  os.listdir(FOLDER_LOCAL.FACTURE_TEST)[0]
-            path_fichier = os.path.join(FOLDER_LOCAL.FACTURE_TEST,nom_fichier)
-            return ModelFacture(path_fichier)
-        elif len(os.listdir(FOLDER_LOCAL.FACTURE_TEST)) >= 1:
-            print("le dossier test doit contenir 1 seul fichier ")
-        else:
-            print("fichier vide")
-            
-# ModelFacture.Test_facture()
+# permet de construire la facture plus facilements
+ModelFacture(ModelFacture.Test_facture())
