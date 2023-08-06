@@ -3,8 +3,31 @@
 ![Badge de version](https://img.shields.io/badge/version-1.0.0-blue)
 <!-- Vous pouvez ajouter d'autres badges ici à partir de shields.io -->
 
-Description courte de ce que fait votre projet.
+# **Gestion Centralisée des Factures**
 
+## **1. Stockage Centralisé et Sécurisé**
+- Centralisation de toutes vos factures en un seul endroit grâce à l'intégration avec Google Drive.
+
+## **2. Gestion Dynamique des Modèles de Factures**
+- Détection automatique de la provenance des factures grâce à un système dynamique de modèles.
+- Création et téléchargement de modèles de factures personnalisés pour une flexibilité accrue.
+
+## **3. Intégration Avancée avec Google Sheets**
+- Vérification de la présence du fichier dans Google Sheets à l'aide de l'ID pour éviter les doublons.
+- Renommage automatique des fichiers selon un format standardisé (exemple : `provenance_id.pdf`).
+
+## **4. Traitement Intelligent des Erreurs**
+- Placement automatique des factures inconnues dans un dossier spécifique sur Google Drive et localement.
+- Gestion des factures avec des informations manquantes en les plaçant dans un dossier dédié sur Google Drive et localement.
+- Pas besoin de communications supplémentaires : vérifiez simplement le dossier Google Drive pour des mises à jour, en particulier si plusieurs collègues utilisent l'application.
+
+## **5. Capture et Conversion Automatisée des Données**
+- Extraction automatique des dates avec prise en charge de divers formats.
+- Capture précise du prix TTC.
+- Flexibilité pour ajouter d'autres informations de capture selon les besoins.
+
+## **6. Creation de prompt Intelligente**
+- En cas de facture inconnue, un prompte chatgpt et générer dans contenue pdf(evite de payer l'api chatgpt)
 ## 🚀 Démarrage
 
 Ces instructions vous permettront d'obtenir une copie du projet en cours d'exécution sur votre machine locale à des fins de développement et de test.
