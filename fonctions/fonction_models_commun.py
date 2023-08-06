@@ -54,9 +54,8 @@ class facture_fonction_commun():
             self.donner_manquante = True
     
     def print_all_info(self):
-        # for key in list(self.facture):
-        #     print(key,":",self.facture[key])
-        #     print(self.facture[key] == None)
+        for key in list(self.facture):
+            print(key,":",self.facture[key])
         pass
     
     def formater_name_facture(self):
@@ -126,7 +125,8 @@ class facture_fonction_commun():
         self.get_all_content_to_pdf()
         self.f_date()
         self.if_info_incomplete()
-        self.print_all_info()
+        if os.path.dirname(self.facture["path"]) == FOLDER_LOCAL.FACTURE_TEST:
+            self.print_all_info()
         self.formater_name_facture()
         self.cree_fichier_texte_prompt_document()
             

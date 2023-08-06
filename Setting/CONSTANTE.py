@@ -30,6 +30,9 @@ class FOLDER_LOCAL():
     FACTURE_INCONNUE= os.path.join(".",DOSSIER_FACTURE,"inconnue")
     MODEL_FACTURE = os.path.join(".",DOSSIER_MODEL_FACTURE)
     PROMPT_GPT = os.path.join(".",DOSSIER_CONTENUE_PDF,"prompt_gpt")
+    FACTURE_TEST= os.path.join(".",DOSSIER_FACTURE,"test_facture_uniquement_1_fichier")
+    
+    
     
     
 

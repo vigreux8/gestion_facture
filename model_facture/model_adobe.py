@@ -1,6 +1,7 @@
 import os
 import re
 from fonctions.fonction_models_commun import facture_fonction_commun
+from Setting.CONSTANTE import FOLDER_LOCAL
 
 
 class ModelFacture(facture_fonction_commun):
@@ -20,7 +21,7 @@ class ModelFacture(facture_fonction_commun):
         else:
             print(f"se n'ai pas une facture {self.provenance}")
         
-    def get_ID(self,contenue):
+    def get_ID(self,contenue) -> str:
         numero_commande = re.search(self.PATTERN_ID,contenue)
         if numero_commande:
            return str(numero_commande.group(1))
@@ -32,7 +33,7 @@ class ModelFacture(facture_fonction_commun):
     def get_nom_produit(self,contenue):
         return "amazon_prime"
     
-    def get_date_achat(self,contenue):
+    def get_date_achat(self,contenue) -> str:
         date_commande = re.search(self.PATTERN_DATE,contenue)
 
         if date_commande:
@@ -42,7 +43,7 @@ class ModelFacture(facture_fonction_commun):
         else:
             return None
 
-    def get_prix_ttc(self,contenue):
+    def get_prix_ttc(self,contenue) -> str:
         prix_total_TTC = re.search(self.PATTERN_PRIX_TTC,contenue)
         if prix_total_TTC:
             return str(prix_total_TTC.group(1))
@@ -50,11 +51,18 @@ class ModelFacture(facture_fonction_commun):
         else:
             return None
             # print("Aucun prix trouvé.")
-        
-
-def main_test():
-    chem_facture =  os.path.join("facture","pas traiter","adobe.pdf")
-    facture = ModelFacture(chem_facture)
-        
-# main_test()
+            
+    @classmethod
+    def Test_facture(self) -> object: 
+        """retourne la facture present dnas le dossier test"""
+        if len(os.listdir(FOLDER_LOCAL.FACTURE_TEST)) == 1:
+            nom_fichier =  os.listdir(FOLDER_LOCAL.FACTURE_TEST)[0]
+            path_fichier = os.path.join(FOLDER_LOCAL.FACTURE_TEST,nom_fichier)
+            return ModelFacture(path_fichier)
+        elif len(os.listdir(FOLDER_LOCAL.FACTURE_TEST)) >= 1:
+            print("le dossier test doit contenir 1 seul fichier ")
+        else:
+            print("fichier vide")
+    
+# ModelFacture.Test_facture()
         

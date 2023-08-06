@@ -1,7 +1,17 @@
 # Nom du projet
 
+
 ![Badge de version](https://img.shields.io/badge/version-1.0.0-blue)
 <!-- Vous pouvez ajouter d'autres badges ici à partir de shields.io -->
+# to-do-list
+- [ ] Gerer la gestion des messages dans le terminal
+  - [ ] indiquer le nb de fichier present dans chaque dossier
+  - [ ] indiquer si il a rajouter la facture avec succées ou non 
+  - [ ] proposer de fermer de le programme (le mettre dans une boucle while)
+- [ ] crée un system pour tester les facture simplement
+  - [ ] dossier test 
+  - [ ] fonction pour recuperer le fichier dans le dossier test
+
 
 # **Gestion Centralisée des Factures**
 
@@ -28,21 +38,18 @@
 
 ## **6. Creation de prompt Intelligente**
 - En cas de facture inconnue, un prompte chatgpt et générer dans contenue pdf(evite de payer l'api chatgpt)
-## 🚀 Démarrage
+# 🚀 Démarrage
 
-Ces instructions vous permettront d'obtenir une copie du projet en cours d'exécution sur votre machine locale à des fins de développement et de test.
+# Clonez ce dépot
+```bash
+git clone https://github.com/vigreux8/gestion_facture.git
+```
 
 ### 📋 Prérequis
 - python 3.10.7
 - virtualenv
 
-```bash
-Exemple de commande
-```
 
-
-# Clonez ce dépot
-git clone https://lien-de-votre-projet.git
 
 # Allez dans le dossier de votre projet
 cd nom-du-projet

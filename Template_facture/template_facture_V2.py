@@ -1,3 +1,8 @@
+import os
+import re
+from fonctions.fonction_models_commun import facture_fonction_commun
+
+
 class ModelFacture(facture_fonction_commun):
     def __init__(self,path_facture_amazon_prime) -> None:
         super().__init__()
@@ -9,8 +14,6 @@ class ModelFacture(facture_fonction_commun):
         print(f"instance : {self.provenance} active")
         self.facture["path"] = path_facture_amazon_prime
         self.facture["name"] = os.path.basename(path_facture_amazon_prime) 
-        
-        print(re.search(self.pattern_provenance_siren,self.contenue_pdf))
         self.get_contenue_pdf()
         if  self.pattern_provenance_siren in self.contenue_pdf:
             self.run_programme_model()
@@ -45,4 +48,19 @@ class ModelFacture(facture_fonction_commun):
             return prix_total_TTC.group(1)
         else:
             return None
+
+    @classmethod
+    def Test_facture(self) -> object: 
+        """retourne la facture present dnas le dossier test"""
+        if len(os.listdir(FOLDER_LOCAL.FACTURE_TEST)) == 1:
+            nom_fichier =  os.listdir(FOLDER_LOCAL.FACTURE_TEST)[0]
+            path_fichier = os.path.join(FOLDER_LOCAL.FACTURE_TEST,nom_fichier)
+            return ModelFacture(path_fichier)
+        elif len(os.listdir(FOLDER_LOCAL.FACTURE_TEST)) >= 1:
+            print("le dossier test doit contenir 1 seul fichier ")
+        else:
+            print("fichier vide ")
+            
+            pass
         
+# ModelFacture.Test_facture()

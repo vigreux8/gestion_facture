@@ -50,17 +50,35 @@ class MrLocal:
                list_fichier_nettoyer.append(os.path.join(folder,fichier))
         return list_fichier_nettoyer
                       
-    def init_model_class_dynamique(self):
+    def init_model_class_dynamique(self) -> None:
+        for models_facture in  self.get_model_class_dynamique()
+            self.list_template_factures.append(models_facture["class"])
+    
+    def get_model_class_dynamique(self) -> list:
+        #permet de proposer un choix des module dans le terminal de maniere dynamique
+        """dict
+        {
+            class : permet de crée une instance de la classe
+            titre : connaitre le nom de la classe
+        }
+        """
+        list_model_facture = []
         for titre_module in (self.listdir_sans_pycache(FOLDER_LOCAL.DOSSIER_MODEL_FACTURE)):
-            modules_factures = {}
-            titre_module = titre_module.replace(".py","")
-            modules_factures["module"] =  f"{FOLDER_LOCAL.DOSSIER_MODEL_FACTURE}.{titre_module}"
-            print(modules_factures["module"])
+            modules_factures = {
+                "module":None,
+                "class": None,
+                "titre": None
+            }
+            modules_factures["titre"] = titre_module.replace(".py","")
+            modules_factures["module"] =  f"{FOLDER_LOCAL.DOSSIER_MODEL_FACTURE}.{modules_factures['titre']}"
             module = importlib.import_module(modules_factures["module"])
             ma_classe = getattr(module, self.pattern_class)
             modules_factures["class"] = ma_classe
             self.list_template_factures.append(modules_factures["class"])
-                    
+            del modules_factures["module"]
+            list_model_facture.append(modules_factures)
+        return list_model_facture 
+       
     def formater_name_inconnue(self):
         path_original = self.facture["path"]
         extension = os.path.splitext(path_original)[-1]
@@ -226,11 +244,15 @@ class MrSheets():
     def main_constructeur(self):
         print(self.get_dict_name_to_lettre_colonne())
 
+class MrTerminals():
+    pass
+    #permet tout les affichage et gérer les prints
 class MrOrchestre():
     def __init__(self) -> None:
         self.sheet = MrSheets()
         self.drive = MrDrive()
         self.local = MrLocal()
+        self.terminal = MrTerminals()
         self.Super_liste_facture = []
     
     def refresh(self):
@@ -253,6 +275,10 @@ class MrOrchestre():
     def move_folder_archiver(self,path):
         self.local.move_file(path,FOLDER_LOCAL.FACTURE_ARCHIVER)
     
+    def tester_facture_choix_terminal(self):
+        #choix module dans le terminal
+        self.local.get_model_class_dynamique()
+        
     
     def run_programme(self):
         list_facture_pas_traiter =  self.local.listdir_path_complet_sans_pycache(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
@@ -324,7 +350,6 @@ class MrOrchestre():
         patch_new = os.path.join(repertoir_parent,new_nom_fichier)
         os.rename(path_original,patch_new)
         return patch_new
-
 
 
 # main_sheet = MrSheets()
