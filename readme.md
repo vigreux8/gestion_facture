@@ -8,9 +8,9 @@
   - [ ] indiquer le nb de fichier present dans chaque dossier
   - [ ] indiquer si il a rajouter la facture avec succées ou non 
   - [ ] proposer de fermer de le programme (le mettre dans une boucle while)
-- [ ] crée un system pour tester les facture simplement
-  - [ ] dossier test 
-  - [ ] fonction pour recuperer le fichier dans le dossier test
+- [x] crée un system pour tester les facture simplement
+  - [x] dossier test 
+  - [x] fonction pour recuperer le fichier dans le dossier test
 
 
 # **Gestion Centralisée des Factures**
