@@ -51,7 +51,7 @@ class MrLocal:
         return list_fichier_nettoyer
                       
     def init_model_class_dynamique(self) -> None:
-        for models_facture in  self.get_model_class_dynamique()
+        for models_facture in  self.get_model_class_dynamique():
             self.list_template_factures.append(models_facture["class"])
     
     def get_model_class_dynamique(self) -> list:

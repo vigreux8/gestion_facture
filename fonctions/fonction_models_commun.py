@@ -92,8 +92,7 @@ class facture_fonction_commun():
         os.rename(path_original,self.facture["path"])
         if self.test:
             print("new_path :",self.facture["path"])
-            
-    
+              
     def get_to_pdf(self,pattern,group,type):
         pattern_found = re.search(pattern,self.contenue_pdf_byte)
         if pattern_found:
