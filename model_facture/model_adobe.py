@@ -53,4 +53,4 @@ class ModelFacture(facture_fonction_commun):
             # print("Aucun prix trouvé.")
     
 # permet de construire la facture plus facilements
-ModelFacture(ModelFacture.Test_facture())
+ModelFacture(ModelFacture.get_path_Test_facture())

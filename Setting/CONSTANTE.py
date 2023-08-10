@@ -34,7 +34,6 @@ class FOLDER_LOCAL():
     
     
     
-    
 
 class GOOGLE_AUTH():
     DOSSIER ="google-api-identifiant"

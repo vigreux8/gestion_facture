@@ -3,6 +3,7 @@ from Setting.CONSTANTE import FOLDER_LOCAL,MOIS_TRADUCTION,OPTION_LOCAL
 from datetime import datetime
 from dateutil.parser import parse
 import PyPDF2
+import re
 
 
 class facture_fonction_commun():
@@ -11,16 +12,29 @@ class facture_fonction_commun():
         self.facture = {
             "path" : path
         }
+        self.list_pattern = [
+            {
+                "id" : (r"{{pattern}}","{{Nb_groupe}}","type","colonne_sheets"),
+                "date" : (r"{{pattern}}","{{Nb_groupe}}","type","colonne_sheets"),
+                "ttc" : (r"{{pattern}}","{{Nb_groupe}}","type","colonne_sheets"),
+            }
+        ]
         self.donner_manquante = False
         self.trouver = False
-        self.test = False
+        self.test = self.detect_test()
         self.contenue_pdf_byte = None
         self.contenue_pdf_str = None
         
         
         self.separateur_rename = OPTION_LOCAL.SEPARATEUR
-      
-    def get_contenue_pdf(self ):
+    def detect_test(self):
+        if os.path.dirname(self.facture["path"]) == FOLDER_LOCAL.FACTURE_TEST:
+            return True
+    
+    def add_pattern(self,key: str,pattern : str,group : int) -> None:
+        self.list_pattern[key] = (pattern,group)
+
+    def get_contenue_pdf(self):
         with open(self.facture["path"],"rb") as binarie_file:
             pdf_reader = PyPDF2.PdfReader(binarie_file)
             first_page = pdf_reader.pages[0]
@@ -51,7 +65,7 @@ class facture_fonction_commun():
                 key_none.append(key)
         if key_none:        
             self.message_erreur_info_incomplete ="_".join((self.message_erreur_info_incomplete,f"{key}")) 
-            self.facture["id"] = self.message_erreur_info_incomplete
+            self.facture["erreur"] = self.message_erreur_info_incomplete
             self.donner_manquante = True
     
     def print_all_info(self):
@@ -63,16 +77,38 @@ class facture_fonction_commun():
         path_original = self.facture["path"]
         extension = os.path.splitext(path_original)[-1]
         repertoir_parent = os.path.dirname(path_original)
-        new_nom_fichier = self.separateur_rename.join([self.provenance,f"{self.facture['id']}{extension}"])
+        if self.donner_manquante:
+            new_nom_fichier = self.separateur_rename.join([self.provenance,f"{self.facture['erreur']}{extension}"])
+        else:
+            new_nom_fichier = self.separateur_rename.join([self.provenance,f"{self.facture['id']}{extension}"])
+            
         #si message erreur donner manquante
-        if self.facture["id"] == self.message_erreur_info_incomplete:
+        if self.if_info_incomplete and not self.test:
             self.facture["path"] = os.path.join(FOLDER_LOCAL.FACTURE_INFO_MANQUANTE,new_nom_fichier)
             self.facture["name"] = os.path.basename(self.facture["path"])
         else:
             self.facture["path"] = os.path.join(repertoir_parent,new_nom_fichier)
             self.facture["name"] = os.path.basename(self.facture["path"])
         os.rename(path_original,self.facture["path"])
-           
+        if self.test:
+            print("new_path :",self.facture["path"])
+            
+    
+    def get_to_pdf(self,pattern,group,type):
+        pattern_found = re.search(pattern,self.contenue_pdf_byte)
+        if pattern_found:
+            if group == "None":
+                return pattern_found
+            elif type == "str" or not type:
+                return str(pattern_found.group(int(group)))
+            elif type == "int":
+                return pattern_found.group(int(group)).replace(".",",")
+        
+                
+                
+        else:
+            return None
+    
     def cree_fichier_texte_prompt_document(self):
         self.get_contenue_pdf()
         chemin_dossier = FOLDER_LOCAL.DOSSIER_CONTENUE_PDF
@@ -113,26 +149,24 @@ class facture_fonction_commun():
         else:
             with open(os.path.join(FOLDER_LOCAL.DOSSIER_CONTENUE_PDF,nom_fichier),"w",encoding="utf-8") as fichier:
                     fichier.write(contenue)
-    def get_all_content_to_pdf(self): 
-            self.facture["date"] = self.get_date_achat(self.contenue_pdf_byte)
-            self.facture["id"] = self.get_ID(self.contenue_pdf_byte)
-            self.facture["provenance"] = self.provenance
-            self.facture["ttc"] = self.get_prix_ttc(self.contenue_pdf_byte)
-            if self.facture["ttc"]:
-                self.facture["ttc"] = self.facture["ttc"].replace(".",",")
     
+    def set_all_content_to_pdf(self):  
+        for key in list(self.list_pattern):
+            pattern,numero_groupe,type = self.list_pattern[key][:-1]
+            self.facture[key] = self.get_to_pdf(pattern,numero_groupe,type)
+            
     def run_programme_model(self):
         self.trouver = True
-        self.get_all_content_to_pdf()
-        self.f_date()
+        self.set_all_content_to_pdf()
+        if not self.test:
+            self.f_date()
         self.if_info_incomplete()
-        if os.path.dirname(self.facture["path"]) == FOLDER_LOCAL.FACTURE_TEST:
-            self.print_all_info()
+        self.print_all_info()
         self.formater_name_facture()
         self.cree_fichier_texte_prompt_document()
         
     @classmethod
-    def Test_facture(self) -> str: 
+    def get_path_Test_facture(self) -> str: 
         """retourne la facture present dnas le dossier test"""
         if len(os.listdir(FOLDER_LOCAL.FACTURE_TEST)) == 1:
             nom_fichier =  os.listdir(FOLDER_LOCAL.FACTURE_TEST)[0]
