@@ -31,8 +31,8 @@ class facture_fonction_commun():
         if os.path.dirname(self.facture["path"]) == FOLDER_LOCAL.FACTURE_TEST:
             return True
     
-    def add_pattern(self,key: str,pattern : str,group : int) -> None:
-        self.list_pattern[key] = (pattern,group)
+    def add_pattern(self,key: str,pattern : str,group : int,type : str,position_sheet: int) -> None:
+        self.list_pattern[key] = (pattern,group,type,position_sheet)
 
     def get_contenue_pdf(self):
         with open(self.facture["path"],"rb") as binarie_file:

@@ -22,6 +22,7 @@ class FOLDER_LOCAL():
     DOSSIER_FACTURE = "facture"
     DOSSIER_CONTENUE_PDF = "ContenuePdf"
     DOSSIER_MODEL_FACTURE = "model_facture"
+    DOSSIER_TEMPLATE_FACTURE = "Template_facture"
     AMAZON = os.path.join(".",DOSSIER_FACTURE,"amazon")
     AMAZON_PRIME = os.path.join(".",DOSSIER_FACTURE,"amazon_prime")
     FACTURE_PAS_TRAITER = os.path.join(".",DOSSIER_FACTURE,"pas traiter")
@@ -31,6 +32,7 @@ class FOLDER_LOCAL():
     MODEL_FACTURE = os.path.join(".",DOSSIER_MODEL_FACTURE)
     PROMPT_GPT = os.path.join(".",DOSSIER_CONTENUE_PDF,"prompt_gpt")
     FACTURE_TEST= os.path.join(".",DOSSIER_FACTURE,"test_facture_uniquement_1_fichier")
+    TEMPLATE_MODEL = os.path.join(".",DOSSIER_TEMPLATE_FACTURE,"template_facture_V3.py")
     
     
     
