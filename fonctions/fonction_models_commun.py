@@ -163,7 +163,7 @@ class facture_fonction_commun():
         self.formater_name_facture()
         self.cree_fichier_texte_prompt_document()
         
-    def get_instance_Test_facture(self) -> classmethod: 
+    def get_instance_Test_facture(self) -> str: 
         '''
         mode : 
             -path : return path

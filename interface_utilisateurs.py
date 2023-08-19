@@ -3,7 +3,8 @@ from Setting.CONSTANTE import FOLDER_LOCAL
 from fonctions.fonction_models_commun import facture_fonction_commun
 import os
 
-class pattern_constructor():
+
+class tool_pattern_constructor():
     def __init__(self) -> None:
         self.pattern = None
         self.liste_groupe = [0]
@@ -21,27 +22,68 @@ class pattern_constructor():
     def get_var_widget_varchar_groupe(self):
         return self.widget_liste_groupe,self.var_tkinter_groupe
     
-    
-        
-class grahpique(facture_fonction_commun):
+class tools_tkinter():
     def __init__(self) -> None:
-        super().__init__(self.get_instance_Test_facture())
-        self.contenue_py = None
-        self.dict_pattern_centralle = {}
         self.fenetre = self.init_fenetre()
         self.last_row_element = 0
         self.var_tkinter_pattern_provenance = self.init_variable_tkinter("siren ou id ou adresse")
-        self.widget_tkinter_presence = {}
         
-        self.get_contenue_pdf()
+    def init_fenetre(self):
+        fenetre = tk.Tk()
+        # fenetre.geometry("800x800")
+        fenetre.title("Fenêtre avec Menu Déroulant")
+        return fenetre
+
+    def init_variable_tkinter(self,info_visible,type="str"):
+        if type == "str":
+            association = tk.StringVar()
+            association.set(info_visible)  # Définir la première option comme valeur par défaut
+        elif type =="int":
+            association = tk.IntVar()
+            association.set(info_visible)
+        return association
         
-    def modifier_pattern(self,nom : str,pattern : str):
-        self.dict_pattern_centralle[nom]["pattern"] = pattern
+    def tkinter_saisi_texte(self,tkinter_variable,v_row=1,v_column=2):
+        widget_saisi_texte = tk.Entry(self.fenetre,textvariable=tkinter_variable)
+        widget_saisi_texte.delete("0", "end")
+        widget_saisi_texte.grid(row=v_row,column=v_column)
+        return widget_saisi_texte
+
+    def tkinter_affichage_texte(self,texte,v_row,v_col):
+        varString = tk.Label(self.fenetre,textvariable=texte)
+        varString.grid(row=v_row,column=v_col)
+        return varString
+    
+    def tkinter_bouton_liste(self, var_tkinter, liste=[0, 1, 2], v_row=1, v_column=1) -> object:
+        widget_menu_deroulant = tk.OptionMenu(self.fenetre, var_tkinter, *liste )
+        widget_menu_deroulant.grid(row=v_row,column= v_column)
+        return widget_menu_deroulant
+
     def tkinter_menus_bas_page(self):
-        #menus bas de page 
         pass
+    
+    def get_tkinter_info_IfKeysPress(self):
+        for key in list(self.dict_pattern_centralle.keys()):
+            all_widget = self.dict_pattern_centralle[key]
+            all_widget.widget_pattern.bind("<KeyPress-Return>", self.ActualiseVariable_tchek)
+            all_widget.widget_liste_groupe.bind("<KeyPress-Return>", self.ActualiseVariable_tchek)
+            all_widget.widget_label.bind("<KeyPress-Return>", self.ActualiseVariable_tchek)
+        
+    def set_tkinter_info_IfKeysPress(self,widget_tkinter):
+        widget_tkinter.bind("<KeyPress-Return>", self.ActualiseVariable_tchek)
+        
+        
+class grahpique_constructors(facture_fonction_commun,tools_tkinter):
+    def __init__(self) -> None:
+        facture_fonction_commun.__init__(self,self.get_instance_Test_facture())
+        tools_tkinter.__init__(self)
+        self.contenue_py = None
+        self.nom_fichier_sortie = None
+        self.dict_pattern_centralle = {}
+        self.get_contenue_pdf()
+
     def cree_pattern_instance(self,nom_pattern : str, type = "str",):
-        pattern_build = pattern_constructor()
+        pattern_build = tool_pattern_constructor()
         pattern_build.nom = nom_pattern
         pattern_build.var_tkinter_sortie = self.init_variable_tkinter("None")
         pattern_build.var_tkinter_pattern = self.init_variable_tkinter("saisir pattern")
@@ -59,24 +101,6 @@ class grahpique(facture_fonction_commun):
             self.last_row_element +=1
             return pattern_info
     
-    def init_fenetre(self):
-        fenetre = tk.Tk()
-        # fenetre.geometry("800x800")
-        fenetre.title("Fenêtre avec Menu Déroulant")
-        return fenetre
-
-    def init_variable_tkinter(self,info_visible,type="str"):
-        if type == "str":
-            association = tk.StringVar()
-            association.set(info_visible)  # Définir la première option comme valeur par défaut
-        elif type =="int":
-            association = tk.IntVar()
-            association.set(info_visible)
-        return association
-        
-    def get_nom_fichier(self):
-        return self.dict_variable_widget["nom_fichier"].get()
-    
     def cree_fichier_model_facture(self):
         path_complet = os.path.join(FOLDER_LOCAL.MODEL_FACTURE,f"{self.get_nom_fichier()}.py") 
         if os.path.exists(path_complet):
@@ -88,7 +112,7 @@ class grahpique(facture_fonction_commun):
     def fichier_py_Rajouter_pattern(self,rajouts="",recherche='#1'):
         for key in list(self.dict_pattern_centralle.keys()):
             pattern = self.dict_pattern_centralle[key]
-            pattern = pattern_constructor()
+            pattern = tool_pattern_constructor()
             rajouts = 'self.add_pattern(self,key: str,pattern : str,group : int,type : str,position_sheet: int)'
             element_rechercher = recherche
             with open(FOLDER_LOCAL.TEMPLATE_MODEL,"r") as facture_template:
@@ -101,22 +125,6 @@ class grahpique(facture_fonction_commun):
 
         #crée une variable de class 
 
-    def tkinter_saisi_texte(self,tkinter_variable,v_row=1,v_column=2):
-        widget_saisi_texte = tk.Entry(self.fenetre,textvariable=tkinter_variable)
-        widget_saisi_texte.delete("0", "end")
-        widget_saisi_texte.grid(row=v_row,column=v_column)
-        return widget_saisi_texte
-
-    def tkinter_affichage_texte(self,texte,v_row,v_col):
-        varString = tk.Label(self.fenetre,textvariable=texte)
-        varString.grid(row=v_row,column=v_col)
-        return varString
-    
-    def tkinter_bouton_liste(self, var_tkinter, liste=[0, 1, 2], v_row=1, v_column=1) -> object:
-        widget_menu_deroulant = tk.OptionMenu(self.fenetre, var_tkinter, *liste )
-        widget_menu_deroulant.grid(row=v_row,column= v_column)
-        return widget_menu_deroulant
-    
     def actualiser_liste(self,pattern_info):
             # pattern_info = pattern_constructor()
             menu = pattern_info.widget_liste_groupe["menu"]
@@ -135,27 +143,17 @@ class grahpique(facture_fonction_commun):
                 pattern_info = self.actualiser_liste(pattern_info)
                 pattern_info.var_tkinter_sortie.set(self.get_to_contenu(pattern,pattern_info.var_tkinter_groupe.get(),pattern_info.type))
                 self.dict_pattern_centralle[key] = pattern_info
-            print("\n")
-                
-    def get_IfKeysPress(self):
-        for key in list(self.dict_pattern_centralle.keys()):
-            all_widget = self.dict_pattern_centralle[key]
-            all_widget.widget_pattern.bind("<KeyPress-Return>", self.ActualiseVariable_tchek)
-            all_widget.widget_liste_groupe.bind("<KeyPress-Return>", self.ActualiseVariable_tchek)
-            all_widget.widget_label.bind("<KeyPress-Return>", self.ActualiseVariable_tchek)
-        
-    def set_IfKeysPress(self,widget_tkinter):
-        widget_tkinter.bind("<KeyPress-Return>", self.ActualiseVariable_tchek)
-        
+            print("\n")       
+
     def main_constructor(self):
         self.cree_pattern_instance("id")
         self.cree_pattern_instance("date")
         self.cree_pattern_instance("ttc",type="int")
         self.cree_pattern_instance("provenance")
-        self.get_IfKeysPress()
+        self.get_tkinter_info_IfKeysPress()
         self.fenetre.mainloop()
         
 # Lancement de la boucle principale
 
-test = grahpique()
+test = grahpique_constructors()
 test.main_constructor()
