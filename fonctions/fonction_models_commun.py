@@ -87,14 +87,18 @@ class facture_fonction_commun():
         return len(re.search(pattern,self.contenue_pdf_byte))
     
     def get_len_groupe(self,pattern):
-        pattern_found = re.search(pattern,self.contenue_pdf_byte)
-        if pattern_found:
-            return len(pattern_found.group(0))
-        return [0]
+        # match = re.search(pattern,self.contenue_pdf_byte)
+        match = re.search(pattern,self.contenue_pdf_byte)
+        if match and not pattern == ''  :
+            # len_match =sum(1 for _ in match)
+            liste_element_match = list(range(0,match.lastindex+1))
+            return liste_element_match
+        else:
+            return [0]
      
     def get_to_contenu(self,pattern,group,type):
         pattern_found = re.search(pattern,self.contenue_pdf_byte)
-        if pattern_found:
+        if pattern_found and not pattern == '':
             if group == "None":
                 return pattern_found
             elif type == "str" or not type:

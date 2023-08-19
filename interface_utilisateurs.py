@@ -10,7 +10,7 @@ class pattern_constructor():
     #gerer le nombre de groupe
     def __init__(self) -> None:
         self.pattern = None
-        self.len_groupe = [0]
+        self.liste_groupe = [0]
         self.type = None
         self.var_tkinter_pattern = None
         self.var_tkinter_groupe = None
@@ -25,13 +25,7 @@ class pattern_constructor():
     def get_var_widget_varchar_groupe(self):
         return self.widget_liste_groupe,self.var_tkinter_groupe
     
-    def actualiser_len_groupe(self,taille_groupe_trouver):
-        taille_groupe = len(taille_groupe_trouver)
-        self.len_groupe = list(range(1,taille_groupe + 1))
     
-    
-    
-        
         
 class grahpique(facture_fonction_commun):
         # cree pattern crée une classe objet pour une gestion simplifier 
@@ -61,7 +55,7 @@ class grahpique(facture_fonction_commun):
             # pattern_info = pattern_constructor()
             pattern_info.widget_label = self.tkinter_affichage_texte(pattern_info.var_tkinter_nom,self.last_row_element,0)
             pattern_info.widget_pattern = self.tkinter_saisi_texte(pattern_info.var_tkinter_pattern,self.last_row_element,1)
-            pattern_info.widget_liste_groupe = self.tkinter_bouton_liste(pattern_info.var_tkinter_groupe,pattern_info.len_groupe,self.last_row_element,2)
+            pattern_info.widget_liste_groupe = self.tkinter_bouton_liste(pattern_info.var_tkinter_groupe,pattern_info.liste_groupe,self.last_row_element,2)
             pattern_info.widget_sortie = self.tkinter_affichage_texte(pattern_info.var_tkinter_sortie,self.last_row_element,3)
             
             self.dict_pattern_centralle[key_pattern] = pattern_info
@@ -130,7 +124,7 @@ class grahpique(facture_fonction_commun):
             # pattern_info = pattern_constructor()
             menu = pattern_info.widget_liste_groupe["menu"]
             menu.delete(0, "end")
-            for element in pattern_info.len_groupe:
+            for element in pattern_info.liste_groupe:
                 menu.add_command(label=element, command=lambda value=element: pattern_info.var_tkinter_groupe.set(value))
             pattern_info.widget_liste_groupe["menu"] = menu 
             return pattern_info
@@ -140,7 +134,7 @@ class grahpique(facture_fonction_commun):
                 pattern_info = self.dict_pattern_centralle[key]
                 pattern = pattern_info.var_tkinter_pattern.get()
                 # pattern_info = pattern_constructor()
-                pattern_info.actualiser_len_groupe(self.get_len_groupe(pattern))
+                pattern_info.liste_groupe = self.get_len_groupe(pattern)
                 pattern_info = self.actualiser_liste(pattern_info)
                 pattern_info.var_tkinter_sortie.set(self.get_to_contenu(pattern,pattern_info.var_tkinter_groupe.get(),pattern_info.type))
                 self.dict_pattern_centralle[key] = pattern_info
