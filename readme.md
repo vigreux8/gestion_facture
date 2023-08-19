@@ -13,6 +13,17 @@
   - [ ] fonction pour recuperer le fichier dans le dossier test
 
 
+  - [ ] '''recrire pattern id, date, ttc de base dans une fonction basique 
+        format patterne
+        def cree_pattern(self,nom_pattern,pattern:str,type:str,):
+        self.list_pattern[nom_pattern] = {"pattern":pattern,
+                                    "Nb_groupe": None,
+                                    "type" : type ,
+                                    "colonne_sheets" : None
+                                    }
+        '''
+
+
 # **Gestion Centralisée des Factures**
 
 ## **1. Stockage Centralisé et Sécurisé**

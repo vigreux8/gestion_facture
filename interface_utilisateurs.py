@@ -1,25 +1,88 @@
 import tkinter as tk
 from Setting.CONSTANTE import FOLDER_LOCAL
+from fonctions.fonction_models_commun import facture_fonction_commun
 import os
+import re
 
+#actualiser liste tkinter
 
-class grahpique():
+class pattern_constructor():
+    #gerer le nombre de groupe
     def __init__(self) -> None:
-        self.contenue_py = None
-        self.fenetre = self.init_fenetre()
-        self.dict_variable_widget = {}
-        self.init_variable_tkinter("groupeid","groupe_valeurs")
-        self.init_variable_tkinter("pattern_id","saisir pattern_id")
-        self.init_variable_tkinter("nom_fichier","saisir nom_fichier")
-        # self.main_constructor()
+        self.pattern = None
+        self.len_groupe = [0]
+        self.type = None
+        self.var_tkinter_pattern = None
+        self.var_tkinter_groupe = None
+        self.var_tkinter_nom = None
+        self.var_tkinter_sortie = None
+        self.colonne_sheets = None
+        self.widget_pattern = None
+        self.widget_liste_groupe = None
+        self.widget_label = None
+        self.widget_sortie = None
+    
+    def get_var_widget_varchar_groupe(self):
+        return self.widget_liste_groupe,self.var_tkinter_groupe
+    
+    def actualiser_len_groupe(self,taille_groupe_trouver):
+        taille_groupe = len(taille_groupe_trouver)
+        self.len_groupe = list(range(1,taille_groupe + 1))
+    
+    
+    
         
+        
+class grahpique(facture_fonction_commun):
+        # cree pattern crée une classe objet pour une gestion simplifier 
+    def __init__(self) -> None:
+        super().__init__(self.get_instance_Test_facture())
+        self.contenue_py = None
+        self.dict_pattern_centralle = {}
+        self.fenetre = self.init_fenetre()
+        self.last_row_element = 0
+        self.get_contenue_pdf()
+        
+    def modifier_pattern(self,nom : str,pattern : str):
+        self.dict_pattern_centralle[nom]["pattern"] = pattern
 
+    def cree_pattern(self,nom_pattern : str, type = "str",):
+        pattern_build = pattern_constructor()
+        pattern_build.nom = nom_pattern
+        pattern_build.var_tkinter_sortie = self.init_variable_tkinter("None")
+        pattern_build.var_tkinter_pattern = self.init_variable_tkinter("saisir pattern")
+        pattern_build.var_tkinter_groupe = self.init_variable_tkinter(0,"int")
+        pattern_build.var_tkinter_nom = self.init_variable_tkinter(nom_pattern)
+        self.dict_pattern_centralle[nom_pattern] = pattern_build
+        
+    def CreeWidgetPattern(self):
+        for key_pattern in list(self.dict_pattern_centralle.keys()):
+            pattern_info = self.dict_pattern_centralle[key_pattern]
+            # pattern_info = pattern_constructor()
+            pattern_info.widget_label = self.tkinter_affichage_texte(pattern_info.var_tkinter_nom,self.last_row_element,0)
+            pattern_info.widget_pattern = self.tkinter_saisi_texte(pattern_info.var_tkinter_pattern,self.last_row_element,1)
+            pattern_info.widget_liste_groupe = self.tkinter_bouton_liste(pattern_info.var_tkinter_groupe,pattern_info.len_groupe,self.last_row_element,2)
+            pattern_info.widget_sortie = self.tkinter_affichage_texte(pattern_info.var_tkinter_sortie,self.last_row_element,3)
+            
+            self.dict_pattern_centralle[key_pattern] = pattern_info
+            
+            self.last_row_element +=1
+    
     def init_fenetre(self):
         fenetre = tk.Tk()
         # fenetre.geometry("800x800")
         fenetre.title("Fenêtre avec Menu Déroulant")
         return fenetre
-    
+
+    def init_variable_tkinter(self,info_visible,type="str"):
+        if type == "str":
+            association = tk.StringVar()
+            association.set(info_visible)  # Définir la première option comme valeur par défaut
+        elif type =="int":
+            association = tk.IntVar()
+            association.set(info_visible)
+        return association
+        
     def get_nom_fichier(self):
         return self.dict_variable_widget["nom_fichier"].get()
     
@@ -30,43 +93,79 @@ class grahpique():
         else:
             with open(path_complet,"w") as fichier:
                 fichier.write(self.contenue_py)
-        
     
-    def Rajouter_pattern(self,rajouts="",recherche='#1'):
-        rajouts = 'self.add_pattern(self,key: str,pattern : str,group : int,type : str,position_sheet: int)'
-        element_rechercher = recherche
-        with open(FOLDER_LOCAL.TEMPLATE_MODEL,"r") as facture_template:
-            contenue_py = facture_template.read()
-        position_depart = contenue_py.find(element_rechercher)+len(recherche)
-        contenu_py_modifier = contenue_py[:position_depart]+"\n"+"\t\t"+rajouts+contenue_py[position_depart:]
-        print(contenu_py_modifier)
-        self.contenue_py = contenu_py_modifier
+    def fichier_py_Rajouter_pattern(self,rajouts="",recherche='#1'):
+        for key in list(self.dict_pattern_centralle.keys()):
+            pattern = self.dict_pattern_centralle[key]
+            pattern = pattern_constructor()
+            rajouts = 'self.add_pattern(self,key: str,pattern : str,group : int,type : str,position_sheet: int)'
+            element_rechercher = recherche
+            with open(FOLDER_LOCAL.TEMPLATE_MODEL,"r") as facture_template:
+                contenue_py = facture_template.read()
+            position_depart = contenue_py.find(element_rechercher)+len(recherche)
+            contenu_py_modifier = contenue_py[:position_depart]+"\n"+"\t\t"+rajouts+contenue_py[position_depart:]
+            print(contenu_py_modifier)
+            self.contenue_py = contenu_py_modifier
             
+
+        #crée une variable de class 
+
+    def tkinter_saisi_texte(self,tkinter_variable,v_row=1,v_column=2):
+        widget_saisi_texte = tk.Entry(self.fenetre,textvariable=tkinter_variable)
+        widget_saisi_texte.delete("0", "end")
+        widget_saisi_texte.grid(row=v_row,column=v_column)
+        return widget_saisi_texte
+
+    def tkinter_affichage_texte(self,texte,v_row,v_col):
+        varString = tk.Label(self.fenetre,textvariable=texte)
+        varString.grid(row=v_row,column=v_col)
+        return varString
     
-    def init_variable_tkinter(self,key,text_visible):
-        association = tk.StringVar()
-        association.set(text_visible)  # Définir la première option comme valeur par défaut
-        self.dict_variable_widget[key] =  association
-    
-    def cree_bouton_liste(self,variable_tkinter,liste,v_row=1,v_column=1):
-        widget_menu_deroulant = tk.OptionMenu(self.fenetre,variable_tkinter,*liste )
+    def tkinter_bouton_liste(self, var_tkinter, liste=[0, 1, 2], v_row=1, v_column=1) -> object:
+        widget_menu_deroulant = tk.OptionMenu(self.fenetre, var_tkinter, *liste )
         widget_menu_deroulant.grid(row=v_row,column= v_column)
         return widget_menu_deroulant
     
-    def ActualiseVariable(self,*args):
-            for key in list(self.dict_variable_widget.keys):
-                self.dict_variable_widget["groupeid"].get()
-                saisi = self.pattern_id.get()
-                print(saisi)
-
+    def actualiser_liste(self,pattern_info):
+            # pattern_info = pattern_constructor()
+            menu = pattern_info.widget_liste_groupe["menu"]
+            menu.delete(0, "end")
+            for element in pattern_info.len_groupe:
+                menu.add_command(label=element, command=lambda value=element: pattern_info.var_tkinter_groupe.set(value))
+            pattern_info.widget_liste_groupe["menu"] = menu 
+            return pattern_info
+            
+    def ActualiseVariable_tchek(self,*args):
+            for key in list(self.dict_pattern_centralle.keys()):
+                pattern_info = self.dict_pattern_centralle[key]
+                pattern = pattern_info.var_tkinter_pattern.get()
+                # pattern_info = pattern_constructor()
+                pattern_info.actualiser_len_groupe(self.get_len_groupe(pattern))
+                pattern_info = self.actualiser_liste(pattern_info)
+                pattern_info.var_tkinter_sortie.set(self.get_to_contenu(pattern,pattern_info.var_tkinter_groupe.get(),pattern_info.type))
+                self.dict_pattern_centralle[key] = pattern_info
+            print("\n")
+                
+    def get_IfKeysPress(self):
+        for key in list(self.dict_pattern_centralle.keys()):
+            all_widget = self.dict_pattern_centralle[key]
+            all_widget.widget_pattern.bind("<KeyPress-Return>", self.ActualiseVariable_tchek)
+            all_widget.widget_liste_groupe.bind("<KeyPress-Return>", self.ActualiseVariable_tchek)
+            all_widget.widget_label.bind("<KeyPress-Return>", self.ActualiseVariable_tchek)
+        
+    def set_IfKeysPress(self,widget_tkinter):
+        widget_tkinter.bind("<KeyPress-Return>", self.ActualiseVariable_tchek)
+        
     def main_constructor(self):
-        widget_liste =  self.cree_bouton_liste(self.dict_variable_widget["groupeid"],["1","2","3"],1,1)
-        widget_liste.pack()
-        widget_saisi_texte = tk.Entry(self.fenetre,textvariable=self.dict_variable_widget["pattern_id"])
-        widget_saisi_texte.pack()
-        widget_saisi_texte.bind("<KeyPress-Return>", self.ActualiseVariable)
+        self.cree_pattern("id")
+        self.cree_pattern("date")
+        self.cree_pattern("ttc",type="int")
+        self.cree_pattern("provenance")
+        self.CreeWidgetPattern()
+        self.get_IfKeysPress()
         self.fenetre.mainloop()
         
 # Lancement de la boucle principale
 
 test = grahpique()
+test.main_constructor()

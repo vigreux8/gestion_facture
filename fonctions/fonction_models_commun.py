@@ -12,13 +12,6 @@ class facture_fonction_commun():
         self.facture = {
             "path" : path
         }
-        self.list_pattern = [
-            {
-                "id" : (r"{{pattern}}","{{Nb_groupe}}","type","colonne_sheets"),
-                "date" : (r"{{pattern}}","{{Nb_groupe}}","type","colonne_sheets"),
-                "ttc" : (r"{{pattern}}","{{Nb_groupe}}","type","colonne_sheets"),
-            }
-        ]
         self.donner_manquante = False
         self.trouver = False
         self.test = self.detect_test()
@@ -31,9 +24,6 @@ class facture_fonction_commun():
         if os.path.dirname(self.facture["path"]) == FOLDER_LOCAL.FACTURE_TEST:
             return True
     
-    def add_pattern(self,key: str,pattern : str,group : int,type : str,position_sheet: int) -> None:
-        self.list_pattern[key] = (pattern,group,type,position_sheet)
-
     def get_contenue_pdf(self):
         with open(self.facture["path"],"rb") as binarie_file:
             pdf_reader = PyPDF2.PdfReader(binarie_file)
@@ -92,8 +82,17 @@ class facture_fonction_commun():
         os.rename(path_original,self.facture["path"])
         if self.test:
             print("new_path :",self.facture["path"])
-              
-    def get_to_pdf(self,pattern,group,type):
+    
+    def get_nombre_groupe_pattern_found(self,pattern):
+        return len(re.search(pattern,self.contenue_pdf_byte))
+    
+    def get_len_groupe(self,pattern):
+        pattern_found = re.search(pattern,self.contenue_pdf_byte)
+        if pattern_found:
+            return len(pattern_found.group(0))
+        return [0]
+     
+    def get_to_contenu(self,pattern,group,type):
         pattern_found = re.search(pattern,self.contenue_pdf_byte)
         if pattern_found:
             if group == "None":
@@ -102,11 +101,7 @@ class facture_fonction_commun():
                 return str(pattern_found.group(int(group)))
             elif type == "int":
                 return pattern_found.group(int(group)).replace(".",",")
-        
-                
-                
-        else:
-            return None
+        return "None"
     
     def cree_fichier_texte_prompt_document(self):
         self.get_contenue_pdf()
@@ -150,9 +145,9 @@ class facture_fonction_commun():
                     fichier.write(contenue)
     
     def set_all_content_to_pdf(self):  
-        for key in list(self.list_pattern):
-            pattern,numero_groupe,type = self.list_pattern[key][:-1]
-            self.facture[key] = self.get_to_pdf(pattern,numero_groupe,type)
+        for key in list(self.dict_pattern_centralle):
+            pattern,numero_groupe,type = self.dict_pattern_centralle[key][:-1]
+            self.facture[key] = self.get_to_contenu(pattern,numero_groupe,type)
             
     def run_programme_model(self):
         self.trouver = True
@@ -164,8 +159,12 @@ class facture_fonction_commun():
         self.formater_name_facture()
         self.cree_fichier_texte_prompt_document()
         
-    @classmethod
-    def get_path_Test_facture(self) -> str: 
+    def get_instance_Test_facture(self) -> classmethod: 
+        '''
+        mode : 
+            -path : return path
+            -instance : retourne la fonction commmun avec le path
+        '''
         """retourne la facture present dnas le dossier test"""
         if len(os.listdir(FOLDER_LOCAL.FACTURE_TEST)) == 1:
             nom_fichier =  os.listdir(FOLDER_LOCAL.FACTURE_TEST)[0]

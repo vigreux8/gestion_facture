@@ -11,6 +11,7 @@ class ModelFacture(facture_fonction_commun):
         print(f"instance : {self.provenance} active")
         self.facture["path"] = path_facture_amazon_prime
         self.facture["name"] = os.path.basename(path_facture_amazon_prime)
+        
         #1
         self.get_contenue_pdf()
         if  self.pattern_provenance_siren in self.contenue_pdf_byte:
@@ -21,5 +22,5 @@ class ModelFacture(facture_fonction_commun):
 
 
 # permet de construire la facture plus facilements
-ModelFacture(ModelFacture.get_path_Test_facture())
+ModelFacture(ModelFacture.get_instance_Test_facture())
  
