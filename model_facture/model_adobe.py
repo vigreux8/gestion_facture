@@ -21,8 +21,6 @@ class ModelFacture(facture_fonction_commun):
         else:
             print(f"se n'ai pas une facture {self.provenance}")
     
-    def
-    
     def get_ID(self,contenue) -> str:
         numero_commande = re.search(self.PATTERN_ID,contenue)
         if numero_commande:
