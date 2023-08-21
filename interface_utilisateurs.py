@@ -121,7 +121,7 @@ class tools_tkinter(preset_tkinter_menue):
         self.last_row_element +=1
         self.tkinter_boutons("appliquer",self.ActualiseVariable,0,6)
         self.tkinter_boutons("cree models facture",self.cree_fichier_model_facture,0,7)
-        self.widget_saisie_texte_independant("provenance","nom_default",1,7)
+        self.widget_saisie_texte_independant("nom fichier","nom_default",1,7)
     
     def print_helloworkd(self):
         print("hello_world")
@@ -172,7 +172,7 @@ class grahpique_constructors(facture_fonction_commun,tools_tkinter):
         if os.path.exists(path_complet):
             "le fichier existe dejat, changer de nom"
         else:
-            with open(path_complet,"w") as fichier:
+            with open(path_complet,"w", encoding="utf-8" ) as fichier:
                 fichier.write(self.contenue_py)
     
     def fichier_py_Rajouter_pattern(self,recherche='#1'):
