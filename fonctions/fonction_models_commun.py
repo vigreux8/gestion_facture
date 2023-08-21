@@ -30,8 +30,6 @@ class facture_fonction_commun():
         self.dict_pattern_centralle = {}
         self.default_ordre_sheets = 0
         
-        
-        
         self.separateur_rename = OPTION_LOCAL.SEPARATEUR
     def detect_test(self):
         if os.path.dirname(self.facture["path"]) == FOLDER_LOCAL.FACTURE_TEST:
@@ -119,7 +117,7 @@ class facture_fonction_commun():
         if pattern_found and not pattern == '':
             if group == "None":
                 return pattern_found
-            elif type == "str" or not type:
+            elif type == "str":
                 return str(pattern_found.group(int(group)))
             elif type == "int":
                 return pattern_found.group(int(group)).replace(".",",")
@@ -166,13 +164,15 @@ class facture_fonction_commun():
             with open(os.path.join(FOLDER_LOCAL.DOSSIER_CONTENUE_PDF,nom_fichier),"w",encoding="utf-8") as fichier:
                     fichier.write(contenue)
     
-    def add_pattern(self,nom,groupe,type,emplacement_sheets = None):
-        pattern = pattern_info()
-        pattern.nom = nom
-        pattern.groupe = groupe
-        pattern.type = type
-        if emplacement_sheets == None:
-            pattern.emplacement_sheets = self.default_ordre_sheets
+    def add_pattern(self,nom,pattern,groupe,type,emplacement_sheets = "None"):
+        pattern_instance = pattern_info()
+        pattern_instance.nom = nom
+        pattern_instance.pattern = pattern
+        pattern_instance.groupe = groupe
+        pattern_instance.type = type
+        
+        if emplacement_sheets == "None":
+            pattern_instance.emplacement_sheets = self.default_ordre_sheets
             self.default_ordre_sheets +=1
         self.dict_pattern_centralle[nom] = pattern_info()
         

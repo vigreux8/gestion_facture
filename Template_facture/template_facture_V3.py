@@ -6,14 +6,14 @@ from fonctions.fonction_models_commun import facture_fonction_commun
 class ModelFacture(facture_fonction_commun):
     def __init__(self,path_facture_amazon_prime) -> None:
         super().__init__(path_facture_amazon_prime)
-        self.provenance = "Adobe"
+        self.provenance = "nom_provenance"
         print(f"instance : {self.provenance} active")
         self.facture["path"] = path_facture_amazon_prime
         self.facture["name"] = os.path.basename(path_facture_amazon_prime)
+        self.provenance = "numero unique"
         
         #1
-        #self.provenance = "numero unique"
-        #add_pattern(self,nom,groupe,type):
+
         
         self.get_contenue_pdf()
         if  self.pattern_provenance in self.contenue_pdf_byte:
