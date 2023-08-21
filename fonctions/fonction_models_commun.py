@@ -6,6 +6,16 @@ import PyPDF2
 import re
 
 
+class pattern_info():
+    def __init__(self) -> None:
+        self.nom = None
+        self.pattern = None
+        self.groupe = None
+        self.out = None
+        self.type = "str"
+        self.emplacement_sheets = None
+
+
 class facture_fonction_commun():
     def __init__(self,path=None) -> None:
         self.message_erreur_info_incomplete = "InfoManquante"
@@ -17,6 +27,9 @@ class facture_fonction_commun():
         self.test = self.detect_test()
         self.contenue_pdf_byte = None
         self.contenue_pdf_str = None
+        self.dict_pattern_centralle = {}
+        self.default_ordre_sheets = 0
+        
         
         
         self.separateur_rename = OPTION_LOCAL.SEPARATEUR
@@ -31,22 +44,27 @@ class facture_fonction_commun():
             self.contenue_pdf_byte = first_page.extract_text()
             
     def f_date(self):
-        facture_date = self.facture['date']
-        try:
-            date_obj = parse(facture_date)
-            date_obj = date_obj.strftime('%d/%m/%Y')
-            self.facture["date"] = date_obj
-        except:
-            try:
-                for mois in list(MOIS_TRADUCTION.MOIS_TRADUCTION_FR_TO_ANGLAIS):
-                    if mois in facture_date:
-                        facture_date = facture_date.replace(mois,MOIS_TRADUCTION.MOIS_TRADUCTION_FR_TO_ANGLAIS[mois])
-                        break
-                date_obj = parse(facture_date)
-                date_obj = date_obj.strftime('%d/%m/%Y')
-                self.facture["date"] = date_obj
-            except ValueError as error:
-                print("An error occurred:", str(error))
+        for keys in self.dict_pattern_centralle.keys():
+            pattern_info = self.dict_pattern_centralle[keys]
+            if pattern_info.type == "date":
+                try:
+                    date_obj = parse(facture_date)
+                    date_obj = date_obj.strftime('%d/%m/%Y')
+                    self.facture["date"] = date_obj
+                except:
+                    try:
+                        for mois in list(MOIS_TRADUCTION.MOIS_TRADUCTION_FR_TO_ANGLAIS):
+                            if mois in facture_date:
+                                facture_date = facture_date.replace(mois,MOIS_TRADUCTION.MOIS_TRADUCTION_FR_TO_ANGLAIS[mois])
+                                break
+                        date_obj = parse(facture_date)
+                        date_obj = date_obj.strftime('%d/%m/%Y')
+                        pattern_info.out = date_obj
+                        self.dict_pattern_centralle[keys] = pattern_info
+                    except ValueError as error:
+                        print("An error occurred:", str(error))
+            else:
+                return
     
     def if_info_incomplete(self):
         key_none = []
@@ -148,10 +166,20 @@ class facture_fonction_commun():
             with open(os.path.join(FOLDER_LOCAL.DOSSIER_CONTENUE_PDF,nom_fichier),"w",encoding="utf-8") as fichier:
                     fichier.write(contenue)
     
+    def add_pattern(self,nom,groupe,type,emplacement_sheets = None):
+        pattern = pattern_info()
+        pattern.nom = nom
+        pattern.groupe = groupe
+        pattern.type = type
+        if emplacement_sheets == None:
+            pattern.emplacement_sheets = self.default_ordre_sheets
+            self.default_ordre_sheets +=1
+        self.dict_pattern_centralle[nom] = pattern_info()
+        
     def set_all_content_to_pdf(self):  
-        for key in list(self.dict_pattern_centralle):
-            pattern,numero_groupe,type = self.dict_pattern_centralle[key][:-1]
-            self.facture[key] = self.get_to_contenu(pattern,numero_groupe,type)
+        for key in list(self.dict_pattern_centralle.keys()):
+            instance_pattern = self.dict_pattern_centralle[key]
+            self.facture[key] = self.get_to_contenu(instance_pattern.pattern,instance_pattern.groupe,type)
             
     def run_programme_model(self):
         self.trouver = True
