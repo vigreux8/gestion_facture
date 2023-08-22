@@ -41,6 +41,8 @@ class facture_fonction_commun():
             pdf_reader = PyPDF2.PdfReader(binarie_file)
             first_page = pdf_reader.pages[0]
             self.contenue_pdf_byte = first_page.extract_text()
+            self.contenue_pdf_str = self.contenue_pdf_byte.encode("utf-8")
+            
     
     def if_type_date(self,type) -> bool:
         if type == "date":
@@ -49,6 +51,8 @@ class facture_fonction_commun():
             return False
         
     def f_date(self,date) -> str:
+        if date == "None":
+            return "None"
         try:
             date_obj = parse(date)
             date_obj = date_obj.strftime('%d/%m/%Y')
@@ -56,7 +60,7 @@ class facture_fonction_commun():
         except:
             try:
                 for mois in list(MOIS_TRADUCTION.MOIS_TRADUCTION_FR_TO_ANGLAIS):
-                    if mois in facture_date:
+                    if mois in date:
                         facture_date = facture_date.replace(mois,MOIS_TRADUCTION.MOIS_TRADUCTION_FR_TO_ANGLAIS[mois])
                         break
                 date_obj = parse(facture_date)

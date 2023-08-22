@@ -106,16 +106,13 @@ class tkinter_tools():
        bouton = tk.Button(self.fenetre,text=texte,command=fonction_declencher)
        bouton.grid(row=v_row,column=v_col)
     
-    def set_variable_tkinter_in_instance_pattern(self,nom_pattern) -> tool_widget_constructor:
+    def set_variable_tkinter_in_instance_pattern(self,nom_pattern,type = "str") -> tool_widget_constructor:
         pattern_build = tool_widget_constructor()
         pattern_build.var_tkinter_nom = self.init_variable_tkinter_pattern(nom_pattern)
         pattern_build.var_tkinter_sortie = self.init_variable_tkinter_pattern("None")
         pattern_build.var_tkinter_saisie = self.init_variable_tkinter_pattern("saisir pattern")
         pattern_build.var_tkinter_groupe = self.init_variable_tkinter_pattern(0,"int")
-        if not nom_pattern == "date":
-            pattern_build.var_tkinter_type = self.init_variable_tkinter_pattern("str")
-        else:
-            pattern_build.var_tkinter_type = self.init_variable_tkinter_pattern("date")
+        pattern_build.var_tkinter_type = self.init_variable_tkinter_pattern(type)
         pattern_build.var_tkinter_emplacement_sheets = self.init_variable_tkinter_pattern(f"B{len(self.dict_pattern_centralle)}")
         return pattern_build
         
@@ -138,6 +135,10 @@ class tkinter_tools():
             self.last_row_element +=1
             return pattern_info
         
+    def copy_to_clipboard(self):
+            self.fenetre.clipboard_clear()
+            self.fenetre.clipboard_append(self.contenue_pdf_str)
+        
     
 
 class tkinter_menu_creators(tkinter_tools):
@@ -147,13 +148,15 @@ class tkinter_menu_creators(tkinter_tools):
         
     
     def tkinter_cree_pattern(self,nom_pattern : str, type = "str",):
-        pattern_build = self.set_widget_in_instance_pattern(self.set_variable_tkinter_in_instance_pattern(nom_pattern))
+        pattern_build = self.set_widget_in_instance_pattern(self.set_variable_tkinter_in_instance_pattern(nom_pattern,type))
         self.dict_pattern_centralle[nom_pattern] = pattern_build
     def tkinter_menus_bas_options(self):
         self.cree_provenance_tchekeur()
         self.last_row_element +=1
         self.tkinter_boutons("appliquer",self.ActualiseVariable,0,6)
         self.tkinter_boutons("cree models facture",self.cree_fichier_model_facture,0,7)
+        self.tkinter_boutons("copy texte pdf",self.copy_to_clipboard,self.last_row_element,1)
+        
         self._init_widget_var_saisie_texte("nom fichier","nom_default",1,7)
         
         
@@ -193,7 +196,7 @@ class grahpique_constructors(tkinter_menu_creators,facture_fonction_commun,):
     def fichier_py_Rajouter_pattern(self,recherche='#1'):
         with open(FOLDER_LOCAL.TEMPLATE_MODEL,"r") as facture_template:
             facture_template = facture_template.read()
-            self.contenue_py = facture_template.replace('"numero unique"',f'"{self.widget_pattern_id_unique["provenance"].var_tkinter_saisie.get()}"')
+            self.contenue_py = facture_template.replace('"numero unique"',f'"{self.widget_pattern_id_unique.var_tkinter_saisie.get()}"')
             self.contenue_py = self.contenue_py.replace('"nom_provenance"',f'"{self.nom_provenance}"')
             
         for key in list(self.dict_pattern_centralle.keys()):
@@ -249,8 +252,8 @@ class grahpique_constructors(tkinter_menu_creators,facture_fonction_commun,):
             print("\n")       
 
     def main_constructor(self):
-        self.tkinter_cree_pattern("id")
-        self.tkinter_cree_pattern("date")
+        self.tkinter_cree_pattern("id",type="str")
+        self.tkinter_cree_pattern("date",type="date")
         self.tkinter_cree_pattern("ttc",type="int")
         self.tkinter_menus_bas_options()
         # self.get_tkinter_info_IfKeysPress()
