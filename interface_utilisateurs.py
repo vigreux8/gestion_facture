@@ -4,8 +4,9 @@ from fonctions.fonction_models_commun import facture_fonction_commun
 import os
 
 # a faire refactoring pour faciliter la maintenabiliter
-#generer un fichier avec les varialbe des pattern trouver
-#
+#pouvoir selectionne la case_sheet ou est upload le fichier
+#quand on upload des fichier le programme regarde les dossier inconnue et facture a traiter
+
 
 class widget_basic():
     def __init__(self) -> None:
@@ -23,16 +24,16 @@ class tool_widget_constructor(widget_basic):
         self.pattern = None
         self.type_date = False
         self.liste_groupe = [0]
-        self.var_tkinter_type = None
-        self.var_tkinter_groupe = None
-        self.var_tkinter_nom = None
-        self.var_tkinter_sortie = None
-        self.var_tkinter_emplacement_sheets = None
+        self.var_tkinter_type :tk.StringVar = None
+        self.var_tkinter_groupe :tk.IntVar = None
+        self.var_tkinter_nom :tk.StringVar = None
+        self.var_tkinter_sortie :tk.StringVar or tk.IntVar  = None
+        self.var_tkinter_emplacement_sheets : tk.StringVar = None
         self.widget_emplacement_sheets = None
-        self.widget_liste_groupe = None
-        self.widget_nom = None
-        self.widget_sortie = None
-        self.widget_type = None
+        self.widget_liste_groupe : tk.OptionMenu = None
+        self.widget_nom : tk.Label = None
+        self.widget_sortie : tk.Entry = None
+        self.widget_type : tk.OptionMenu = None
     
     def get_var_widget_varchar_groupe(self):
         return self.widget_liste_groupe,self.var_tkinter_groupe
@@ -56,7 +57,7 @@ class tools_tkinter(preset_tkinter_menue):
     def __init__(self) -> None:
         super().__init__()
         self.last_row_element = 0
-        self.dict_widget_pattern = {}
+        self.dict_widget_pattern: dict[str,tool_widget_constructor] = {}
         self.dict_widget_menu = {}
         
         self.fenetre = self.init_fenetre()  
@@ -126,18 +127,6 @@ class tools_tkinter(preset_tkinter_menue):
     def print_helloworkd(self):
         print("hello_world")
     
-    # def get_tkinter_info_IfKeysPress(self):
-    #     # for key in list(self.dict_pattern_centralle.keys()):
-    #     #     all_widget = self.dict_pattern_centralle[key]
-    #     #     all_widget.widget_saisie.bind("<KeyPress-Return>", self.ActualiseVariable_tchek_pattern)
-    #     #     all_widget.widget_liste_groupe.bind("<KeyPress-Return>", self.ActualiseVariable_tchek_pattern)
-    #     #     all_widget.widget_nom.bind("<KeyPress-Return>", self.ActualiseVariable_tchek_pattern)
-    #     # self.dict_widget_pattern["provenance"].widget_saisie.bind("<KeyPress-Return>", self.ActualiseVariable_tchek_pattern)
-    #     # self.dict_widget_pattern["provenance"].widget_saisie.bind("<KeyPress-Return>", self.ActualiseVariable_tchek_pattern)
-
-    # def set_tkinter_info_IfKeysPress(self,widget_tkinter):
-    #     widget_tkinter.bind("<KeyPress-Return>", self.ActualiseVariable_tchek_pattern)
-
     def tkinter_boutons(self,texte,fonction_declencher,v_row,v_col):
        bouton = tk.Button(self.fenetre,text=texte,command=fonction_declencher)
        bouton.grid(row=v_row,column=v_col)
@@ -148,11 +137,11 @@ class grahpique_constructors(facture_fonction_commun,tools_tkinter):
         tools_tkinter.__init__(self)
         self.contenue_py = None
         self.nom_provenance = None
-        self.dict_pattern_centralle = {}
+        self.dict_pattern_centralle : dict[str,tool_widget_constructor] = {}
         self.get_contenue_pdf()
 
 
-    def cree_pattern(self,nom_pattern : str, type = "str",):
+    def tkinter_cree_pattern(self,nom_pattern : str, type = "str",):
         pattern_build = tool_widget_constructor()
         pattern_build.var_tkinter_nom = self.init_variable_tkinter(nom_pattern)
         pattern_build.var_tkinter_sortie = self.init_variable_tkinter("None")
@@ -162,10 +151,8 @@ class grahpique_constructors(facture_fonction_commun,tools_tkinter):
         pattern_build.var_tkinter_emplacement_sheets = self.init_variable_tkinter("None")
         
         pattern_build = self.template_widget_pattern(pattern_build)
-        self.dict_pattern_centralle[nom_pattern] = pattern_build
-        
-    
-    
+        self.dict_pattern_centralle[nom_pattern] = pattern_build    
+
     def cree_fichier_model_facture(self):
         self.fichier_py_Rajouter_pattern()
         path_complet = os.path.join(FOLDER_LOCAL.MODEL_FACTURE,f"model_{self.nom_provenance}.py") 
@@ -198,7 +185,7 @@ class grahpique_constructors(facture_fonction_commun,tools_tkinter):
 
         #crée une variable de class 
 
-    def actualiser_liste(self,pattern_info):
+    def actualiser_liste(self,pattern_info :tool_widget_constructor):
             # pattern_info = pattern_constructor()
             menu = pattern_info.widget_liste_groupe["menu"]
             menu.delete(0, "end")
@@ -238,9 +225,9 @@ class grahpique_constructors(facture_fonction_commun,tools_tkinter):
             print("\n")       
 
     def main_constructor(self):
-        self.cree_pattern("id")
-        self.cree_pattern("date")
-        self.cree_pattern("ttc",type="int")
+        self.tkinter_cree_pattern("id")
+        self.tkinter_cree_pattern("date")
+        self.tkinter_cree_pattern("ttc",type="int")
         self.tkinter_menus_bas_page()
         # self.get_tkinter_info_IfKeysPress()
         self.fenetre.mainloop()

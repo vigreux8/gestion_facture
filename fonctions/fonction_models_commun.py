@@ -8,12 +8,13 @@ import re
 
 class pattern_info():
     def __init__(self) -> None:
-        self.nom = None
-        self.pattern = None
-        self.groupe = None
-        self.out = None
-        self.type = "str"
-        self.emplacement_sheets = None
+        self.nom :str = None
+        self.pattern :str = None
+        self.groupe : int = None
+        self.out :str or int = None
+        self.type : str = "str"
+        # col+numero  exemple : "A1"
+        self.emplacement_sheets :str = None
 
 
 class facture_fonction_commun():
@@ -27,7 +28,7 @@ class facture_fonction_commun():
         self.test = self.detect_test()
         self.contenue_pdf_byte = None
         self.contenue_pdf_str = None
-        self.dict_pattern_centralle = {}
+        self.dict_pattern_centralle : dict(str,pattern_info) = {}
         self.default_ordre_sheets = 0
         
         self.separateur_rename = OPTION_LOCAL.SEPARATEUR
@@ -174,7 +175,7 @@ class facture_fonction_commun():
         if emplacement_sheets == "None":
             pattern_instance.emplacement_sheets = self.default_ordre_sheets
             self.default_ordre_sheets +=1
-        self.dict_pattern_centralle[nom] = pattern_info()
+        self.dict_pattern_centralle[nom] = pattern_instance
         
     def set_all_content_to_pdf(self):  
         for key in list(self.dict_pattern_centralle.keys()):
