@@ -10,8 +10,8 @@ import os
 
 class widget_basic():
     def __init__(self) -> None:
-        self.var_tkinter_saisie = None 
-        self.widget_saisie = None
+        self.var_tkinter_saisie : tk.StringVar = None 
+        self.widget_saisie : tk.Entry  = None
         
     def get_saisie(self):
         return self.var_tkinter_saisie.get()
@@ -22,7 +22,6 @@ class tool_widget_constructor(widget_basic):
     def __init__(self) -> None:
         super().__init__()
         self.pattern = None
-        self.type_date = False
         self.liste_groupe = [0]
         self.var_tkinter_type :tk.StringVar = None
         self.var_tkinter_groupe :tk.IntVar = None
@@ -40,46 +39,36 @@ class tool_widget_constructor(widget_basic):
 
 
 
-class preset_tkinter_menue():
-    
-    def template_widget_pattern(self,pattern_info):
-            pattern_info.widget_nom = self.tkinter_affichage_texte(pattern_info.var_tkinter_nom,self.last_row_element,0)
-            pattern_info.widget_saisie = self.tkinter_saisi_texte(pattern_info.var_tkinter_saisie,self.last_row_element,1)
-            pattern_info.widget_liste_groupe = self.tkinter_bouton_liste(pattern_info.var_tkinter_groupe,pattern_info.liste_groupe,self.last_row_element,2)
-            pattern_info.widget_type = self.tkinter_bouton_liste(pattern_info.var_tkinter_type,["str","int","date"],self.last_row_element,3)
-            pattern_info.widget_sortie = self.tkinter_affichage_texte(pattern_info.var_tkinter_sortie,self.last_row_element,4)
-            self.last_row_element +=1
-            return pattern_info
+
     
     
 
-class tools_tkinter(preset_tkinter_menue):
+class tkinter_tools():
     def __init__(self) -> None:
-        super().__init__()
         self.last_row_element = 0
-        self.dict_widget_pattern: dict[str,tool_widget_constructor] = {}
-        self.dict_widget_menu = {}
-        
         self.fenetre = self.init_fenetre()  
+        self.widget_pattern_id_unique : widget_basic= ""
+        self.dict_pattern_centralle : dict[str,tool_widget_constructor] = {}
+        self.dict_widget_menu : dict[str,widget_basic] = {}
     
-    def widget_saisie_texte_independant(self,nom,valeur_var_tkinter,v_row,v_col):
+    def _init_widget_var_saisie_texte(self,nom,valeur_var_tkinter,v_row,v_col):
         nom_fichier_instance = widget_basic()
-        nom_fichier_instance.var_tkinter_saisie = self.init_variable_tkinter(valeur_var_tkinter)
-        nom_fichier_instance.widget_saisie = self.tkinter_saisi_texte(nom_fichier_instance.var_tkinter_saisie,v_row=v_row,v_column=v_col,texte_default=True)
+        nom_fichier_instance.var_tkinter_saisie = self.init_variable_tkinter_pattern(valeur_var_tkinter)
+        nom_fichier_instance.widget_saisie = self.tkinter_saisi_texte(nom_fichier_instance.var_tkinter_saisie,v_row=v_row,v_column=v_col,keep_texte_default=True)
         self.dict_widget_menu[nom] = nom_fichier_instance
         
     def add_widget_provenance(self,nom,):
         autre_widget_info = tool_widget_constructor()
         #init variable tkinter
-        autre_widget_info.var_tkinter_nom = self.init_variable_tkinter(nom)
-        autre_widget_info.var_tkinter_saisie = self.init_variable_tkinter("saisir donner fixe ex : tva/siren/adresse")
-        autre_widget_info.var_tkinter_sortie = self.init_variable_tkinter("False")
+        autre_widget_info.var_tkinter_nom = self.init_variable_tkinter_pattern(nom)
+        autre_widget_info.var_tkinter_saisie = self.init_variable_tkinter_pattern("saisir donner fixe ex : tva/siren/adresse")
+        autre_widget_info.var_tkinter_sortie = self.init_variable_tkinter_pattern("False")
         
         #init widget
         autre_widget_info.widget_nom = self.tkinter_affichage_texte( autre_widget_info.var_tkinter_nom,self.last_row_element,0)
         autre_widget_info.widget_saisie = self.tkinter_saisi_texte(autre_widget_info.var_tkinter_saisie,self.last_row_element,1)
         autre_widget_info.widget_sortie = self.tkinter_affichage_texte(autre_widget_info.var_tkinter_sortie,self.last_row_element,2)
-        self.dict_widget_pattern[nom] = autre_widget_info
+        self.widget_pattern_id_unique = autre_widget_info
     
     def cree_provenance_tchekeur(self):
         self.add_widget_provenance("provenance")
@@ -90,18 +79,9 @@ class tools_tkinter(preset_tkinter_menue):
         fenetre.title("Fenêtre avec Menu Déroulant")
         return fenetre
 
-    def init_variable_tkinter(self,info_visible,type="str"):
-        if type == "str":
-            association = tk.StringVar()
-            association.set(info_visible)  # Définir la première option comme valeur par défaut
-        elif type =="int":
-            association = tk.IntVar()
-            association.set(info_visible)
-        return association
-        
-    def tkinter_saisi_texte(self,varchart_tk,v_row=1,v_column=2,texte_default = False):
+    def tkinter_saisi_texte(self,varchart_tk,v_row=1,v_column=2,keep_texte_default = False):
         widget_saisi_texte = tk.Entry(self.fenetre,textvariable=varchart_tk)
-        if not texte_default:
+        if not keep_texte_default:
             widget_saisi_texte.delete("0", "end")
         widget_saisi_texte.grid(row=v_row,column=v_column)
         return widget_saisi_texte
@@ -117,12 +97,7 @@ class tools_tkinter(preset_tkinter_menue):
         widget_menu_deroulant.grid(row=v_row,column= v_column)
         return widget_menu_deroulant
 
-    def tkinter_menus_bas_page(self):
-        self.cree_provenance_tchekeur()
-        self.last_row_element +=1
-        self.tkinter_boutons("appliquer",self.ActualiseVariable,0,6)
-        self.tkinter_boutons("cree models facture",self.cree_fichier_model_facture,0,7)
-        self.widget_saisie_texte_independant("nom fichier","nom_default",1,7)
+  
     
     def print_helloworkd(self):
         print("hello_world")
@@ -130,28 +105,81 @@ class tools_tkinter(preset_tkinter_menue):
     def tkinter_boutons(self,texte,fonction_declencher,v_row,v_col):
        bouton = tk.Button(self.fenetre,text=texte,command=fonction_declencher)
        bouton.grid(row=v_row,column=v_col)
+    
+    def set_variable_tkinter_in_instance_pattern(self,nom_pattern) -> tool_widget_constructor:
+        pattern_build = tool_widget_constructor()
+        pattern_build.var_tkinter_nom = self.init_variable_tkinter_pattern(nom_pattern)
+        pattern_build.var_tkinter_sortie = self.init_variable_tkinter_pattern("None")
+        pattern_build.var_tkinter_saisie = self.init_variable_tkinter_pattern("saisir pattern")
+        pattern_build.var_tkinter_groupe = self.init_variable_tkinter_pattern(0,"int")
+        if not nom_pattern == "date":
+            pattern_build.var_tkinter_type = self.init_variable_tkinter_pattern("str")
+        else:
+            pattern_build.var_tkinter_type = self.init_variable_tkinter_pattern("date")
+        pattern_build.var_tkinter_emplacement_sheets = self.init_variable_tkinter_pattern(f"B{len(self.dict_pattern_centralle)}")
+        return pattern_build
         
-class grahpique_constructors(facture_fonction_commun,tools_tkinter):
+    def init_variable_tkinter_pattern(self,info_visible,type="str"):
+        if type == "str":
+            association = tk.StringVar()
+            association.set(info_visible)  # Définir la première option comme valeur par défaut
+        elif type =="int":
+            association = tk.IntVar()
+            association.set(info_visible)
+        return association
+        
+    def set_widget_in_instance_pattern(self,pattern_info : tool_widget_constructor) ->tool_widget_constructor:
+            pattern_info.widget_nom = self.tkinter_affichage_texte(pattern_info.var_tkinter_nom,self.last_row_element,0)
+            pattern_info.widget_saisie = self.tkinter_saisi_texte(pattern_info.var_tkinter_saisie,self.last_row_element,1)
+            pattern_info.widget_liste_groupe = self.tkinter_bouton_liste(pattern_info.var_tkinter_groupe,pattern_info.liste_groupe,self.last_row_element,2)
+            pattern_info.widget_type = self.tkinter_bouton_liste(pattern_info.var_tkinter_type,["str","int","date"],self.last_row_element,3)
+            pattern_info.widget_sortie = self.tkinter_affichage_texte(pattern_info.var_tkinter_sortie,self.last_row_element,4)
+            pattern_info.widget_emplacement_sheets = self.tkinter_saisi_texte(pattern_info.var_tkinter_emplacement_sheets,self.last_row_element,5,keep_texte_default=True)
+            self.last_row_element +=1
+            return pattern_info
+        
+    
+
+class tkinter_menu_creators(tkinter_tools):
+    #initalise tout les menus
+    def __init__(self) -> None:
+        super().__init__()
+        
+    
+    def tkinter_cree_pattern(self,nom_pattern : str, type = "str",):
+        pattern_build = self.set_widget_in_instance_pattern(self.set_variable_tkinter_in_instance_pattern(nom_pattern))
+        self.dict_pattern_centralle[nom_pattern] = pattern_build
+    def tkinter_menus_bas_options(self):
+        self.cree_provenance_tchekeur()
+        self.last_row_element +=1
+        self.tkinter_boutons("appliquer",self.ActualiseVariable,0,6)
+        self.tkinter_boutons("cree models facture",self.cree_fichier_model_facture,0,7)
+        self._init_widget_var_saisie_texte("nom fichier","nom_default",1,7)
+        
+        
+class grahpique_constructors(tkinter_menu_creators,facture_fonction_commun,):
+    '''
+    set_all_content_to_pdf() : fonctions surecrite elle ecrase celle present dans facture_fonction_commun()
+    '''
+    
     def __init__(self) -> None:
         facture_fonction_commun.__init__(self,self.get_instance_Test_facture())
-        tools_tkinter.__init__(self)
+        tkinter_menu_creators.__init__(self)
         self.contenue_py = None
         self.nom_provenance = None
-        self.dict_pattern_centralle : dict[str,tool_widget_constructor] = {}
         self.get_contenue_pdf()
 
-
-    def tkinter_cree_pattern(self,nom_pattern : str, type = "str",):
-        pattern_build = tool_widget_constructor()
-        pattern_build.var_tkinter_nom = self.init_variable_tkinter(nom_pattern)
-        pattern_build.var_tkinter_sortie = self.init_variable_tkinter("None")
-        pattern_build.var_tkinter_saisie = self.init_variable_tkinter("saisir pattern")
-        pattern_build.var_tkinter_groupe = self.init_variable_tkinter(0,"int")
-        pattern_build.var_tkinter_type = self.init_variable_tkinter("str")
-        pattern_build.var_tkinter_emplacement_sheets = self.init_variable_tkinter("None")
-        
-        pattern_build = self.template_widget_pattern(pattern_build)
-        self.dict_pattern_centralle[nom_pattern] = pattern_build    
+    def set_all_content_to_pdf(self,instance_pattern : tool_widget_constructor) -> tool_widget_constructor:  
+        #fonctions sur-ecrite  elle existe aussi sur fonction model communs sous un autre format
+            sortie = self.get_to_contenu(instance_pattern.var_tkinter_saisie.get(),instance_pattern.var_tkinter_groupe.get(),instance_pattern.var_tkinter_type.get())
+            if self.if_type_date(instance_pattern.var_tkinter_type.get()):
+                instance_pattern.var_tkinter_sortie.set(self.f_date(sortie)) 
+                return instance_pattern
+            else:
+                instance_pattern.var_tkinter_sortie.set(sortie) 
+                return instance_pattern
+                
+   
 
     def cree_fichier_model_facture(self):
         self.fichier_py_Rajouter_pattern()
@@ -165,7 +193,7 @@ class grahpique_constructors(facture_fonction_commun,tools_tkinter):
     def fichier_py_Rajouter_pattern(self,recherche='#1'):
         with open(FOLDER_LOCAL.TEMPLATE_MODEL,"r") as facture_template:
             facture_template = facture_template.read()
-            self.contenue_py = facture_template.replace('"numero unique"',f'"{self.dict_widget_pattern["provenance"].var_tkinter_saisie.get()}"')
+            self.contenue_py = facture_template.replace('"numero unique"',f'"{self.widget_pattern_id_unique["provenance"].var_tkinter_saisie.get()}"')
             self.contenue_py = self.contenue_py.replace('"nom_provenance"',f'"{self.nom_provenance}"')
             
         for key in list(self.dict_pattern_centralle.keys()):
@@ -204,22 +232,18 @@ class grahpique_constructors(facture_fonction_commun,tools_tkinter):
         
     def ActualiseVariable(self,*args):
             self.nom_provenance = self.dict_widget_menu["nom fichier"].get_saisie()
-            pattern_de_provenance = self.dict_widget_pattern["provenance"].var_tkinter_saisie.get()
+            pattern_de_provenance = self.widget_pattern_id_unique.var_tkinter_saisie.get()
             
             if self.if_motif_in_pdf(pattern_de_provenance):
-                self.dict_widget_pattern["provenance"].var_tkinter_sortie.set("True")
+                self.widget_pattern_id_unique.var_tkinter_sortie.set("True")
             else :
-                self.dict_widget_pattern["provenance"].var_tkinter_sortie.set("False")
+                self.widget_pattern_id_unique.var_tkinter_sortie.set("False")
             for key in list(self.dict_pattern_centralle.keys()):
                 pattern_info = self.dict_pattern_centralle[key]
-                if pattern_info.var_tkinter_type == "date":
-                    pattern_info.type_date = True
-                else:
-                    pattern_info.type_date = False
                 pattern = pattern_info.var_tkinter_saisie.get()
                 pattern_info.liste_groupe = self.get_len_groupe(pattern)
                 pattern_info = self.actualiser_liste(pattern_info)
-                pattern_info.var_tkinter_sortie.set(self.get_to_contenu(pattern,pattern_info.var_tkinter_groupe.get(),pattern_info.var_tkinter_type.get()))
+                pattern_info = self.set_all_content_to_pdf(pattern_info)
                 self.dict_pattern_centralle[key] = pattern_info
       
             print("\n")       
@@ -228,7 +252,7 @@ class grahpique_constructors(facture_fonction_commun,tools_tkinter):
         self.tkinter_cree_pattern("id")
         self.tkinter_cree_pattern("date")
         self.tkinter_cree_pattern("ttc",type="int")
-        self.tkinter_menus_bas_page()
+        self.tkinter_menus_bas_options()
         # self.get_tkinter_info_IfKeysPress()
         self.fenetre.mainloop()
         

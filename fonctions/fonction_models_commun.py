@@ -28,7 +28,7 @@ class facture_fonction_commun():
         self.test = self.detect_test()
         self.contenue_pdf_byte = None
         self.contenue_pdf_str = None
-        self.dict_pattern_centralle : dict(str,pattern_info) = {}
+        self.dict_pattern_centralle : dict[str,pattern_info] = {}
         self.default_ordre_sheets = 0
         
         self.separateur_rename = OPTION_LOCAL.SEPARATEUR
@@ -41,29 +41,30 @@ class facture_fonction_commun():
             pdf_reader = PyPDF2.PdfReader(binarie_file)
             first_page = pdf_reader.pages[0]
             self.contenue_pdf_byte = first_page.extract_text()
-            
-    def f_date(self):
-        for keys in self.dict_pattern_centralle.keys():
-            pattern_info = self.dict_pattern_centralle[keys]
-            if pattern_info.type == "date":
-                try:
-                    date_obj = parse(facture_date)
-                    date_obj = date_obj.strftime('%d/%m/%Y')
-                    self.facture["date"] = date_obj
-                except:
-                    try:
-                        for mois in list(MOIS_TRADUCTION.MOIS_TRADUCTION_FR_TO_ANGLAIS):
-                            if mois in facture_date:
-                                facture_date = facture_date.replace(mois,MOIS_TRADUCTION.MOIS_TRADUCTION_FR_TO_ANGLAIS[mois])
-                                break
-                        date_obj = parse(facture_date)
-                        date_obj = date_obj.strftime('%d/%m/%Y')
-                        pattern_info.out = date_obj
-                        self.dict_pattern_centralle[keys] = pattern_info
-                    except ValueError as error:
-                        print("An error occurred:", str(error))
-            else:
-                return
+    
+    def if_type_date(self,type) -> bool:
+        if type == "date":
+            return True
+        else:
+            return False
+        
+    def f_date(self,date) -> str:
+        try:
+            date_obj = parse(date)
+            date_obj = date_obj.strftime('%d/%m/%Y')
+            return date_obj
+        except:
+            try:
+                for mois in list(MOIS_TRADUCTION.MOIS_TRADUCTION_FR_TO_ANGLAIS):
+                    if mois in facture_date:
+                        facture_date = facture_date.replace(mois,MOIS_TRADUCTION.MOIS_TRADUCTION_FR_TO_ANGLAIS[mois])
+                        break
+                date_obj = parse(facture_date)
+                date_obj = date_obj.strftime('%d/%m/%Y')
+                return date_obj
+            except ValueError as error:
+                print("An error occurred:", str(error))
+
     
     def if_info_incomplete(self):
         key_none = []
@@ -118,10 +119,11 @@ class facture_fonction_commun():
         if pattern_found and not pattern == '':
             if group == "None":
                 return pattern_found
-            elif type == "str":
+            elif type == "str" or "date":
                 return str(pattern_found.group(int(group)))
             elif type == "int":
                 return pattern_found.group(int(group)).replace(".",",")
+                
         return "None"
     
     def cree_fichier_texte_prompt_document(self):
@@ -180,13 +182,16 @@ class facture_fonction_commun():
     def set_all_content_to_pdf(self):  
         for key in list(self.dict_pattern_centralle.keys()):
             instance_pattern = self.dict_pattern_centralle[key]
-            self.facture[key] = self.get_to_contenu(instance_pattern.pattern,instance_pattern.groupe,type)
+            sortie = self.get_to_contenu(instance_pattern.pattern,instance_pattern.groupe,instance_pattern.type)
+            
+            if self.if_type_date(instance_pattern.type):
+               self.dict_pattern_centralle[key].out = self.f_date(sortie)
+            else:
+                self.dict_pattern_centralle[key].out = sortie
             
     def run_programme_model(self):
         self.trouver = True
         self.set_all_content_to_pdf()
-        if not self.test:
-            self.f_date()
         self.if_info_incomplete()
         self.print_all_info()
         self.formater_name_facture()
