@@ -1,7 +1,10 @@
 from fonctions.fonction_principale import *
-from interface_utilisateurs import *
+from fonctions.interface_utilisateurs import *
 
 
-# main =  MrOrchestre()
-# main.run_programme()
+test = grahpique_constructors()
+test.main_constructor()
+
+main =  MrOrchestre()
+main.run_programme()
 

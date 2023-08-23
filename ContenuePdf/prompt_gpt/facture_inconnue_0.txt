@@ -1,0 +1,59 @@
+voici une facture garde la en memoire et repond uniquement "OK je suis pret a prendre les consigne" n écrire rien d autre
+    facture :"Facture
+Page 1 de 1Amazon EU S.à r.l., Succursale Française – 67 Boulevard du Général Leclerc, 92110 Clichy, France
+SIREN : 487773327 • RCS Nanterre • APE : 4791B • TVA : FR 12487773327Taux TVA  Total
+(HT)Sous-total
+de la TVA
+20 % 5.82 1.17
+Total en
+EUR5.82 1.17Facture Total EUR 6.99Détails de la factureDate de la commande 21 mars 2023
+Numéro de la commande D01-3598561-0389456Payé 
+Vendu par Amazon EU S.à r.l., Succursale Française 
+TVA # FR12487773327
+Date de la facture/Date de la
+livraison 21 mars 2023
+Numéro de la facture AEU-INV-FR-2023-10752612
+Total à payer EUR 6.99JEAN-BAPTISTE VIGREUX 
+21 RUE DE L'AQUEDUC, L'ORANGERAIS 
+NARBONNE, AUDE, 11100 
+FR 
+Veuillez contacter le Service Client en visitant le lien suivant: www.amazon.fr/contact-us
+ À l'attention de
+jean-baptiste vigreux 
+21 rue de l'aqueduc, l'orangerais 
+narbonne, aude, 11100 
+FR  Vendu par
+Amazon EU S.à r.l., Succursale Française 
+67 Boulevard du General Leclerc 
+Clichy 92110 
+France 
+TVA # FR12487773327 
+Informations de la commande
+Description Qté Prix Unitaire 
+ EUR
+(HT)Taux TVA Prix Unitaire 
+ EUR
+(TTC)Total 
+ EUR
+(TTC)
+Prix de l'abonnement Prime 
+ASIN: B079F2CKNY1 5.82 20 % 6.99 6.99"
+
+
+    voici tes consignes a partir du pdf fournie et tu dois parfaitement les respecter :
+    tu peux créer le regex
+    installe-le ensuite dans un fichier que je peux copier (n indique pas de commentaires en # mais les variables à la suite et n explique rien)
+    CONSIGNE IMPORTANT:
+    -le prix doit être uniquement composer de valeur numerique separer par une virgule
+    -la date doit se composer uniquement de la date et rien d'autre 
+    self.PATTERN_ID = r"ici patern regex pour trouver le numéro de facture l id doit être unique à chaque facture"
+    self.PATTERN_DATE = r"ici paterne date"
+    self.PATTERN_PRIX_TTC = r"ici paterne regex du prix TTC"
+    identifiant_unique = "ressort le numéro de TVA ou le SIREN ou SIRET ou l adresse de l entreprise surtout pas un numero commande ou idenfiant semblable a l'id"
+
+    afficher les resultat attendu dans ton encadre chatgpt :
+
+    1. Identifiant de la facture : []
+    2. Date de la facture : []
+    3. Prix total TTC : []
+    4. Identifiant unique : [] 

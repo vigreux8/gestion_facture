@@ -20,36 +20,36 @@ class pattern_info():
 class facture_fonction_commun():
     def __init__(self,path=None) -> None:
         self.message_erreur_info_incomplete = "InfoManquante"
-        self.facture = {
-            "path" : path
-        }
+        self.path = path
         self.donner_manquante = False
         self.trouver = False
-        self.test = self.detect_test()
+        self.if_fichier_test_present = self.detect_test()
         self.contenue_pdf_byte = None
         self.contenue_pdf_str = None
         self.dict_pattern_centralle : dict[str,pattern_info] = {}
         self.default_ordre_sheets = 0
+        self.quelle_donner_manquante :str = ""
+        self.provenance = "numero unique"
+        
+        
         
         self.separateur_rename = OPTION_LOCAL.SEPARATEUR
     def detect_test(self):
-        if os.path.dirname(self.facture["path"]) == FOLDER_LOCAL.FACTURE_TEST:
-            return True
+        if not self.path == None:
+            if os.path.dirname(self.path) == FOLDER_LOCAL.FACTURE_TEST:
+                return True
+        else:
+            return False
+            
     
     def get_contenue_pdf(self):
-        with open(self.facture["path"],"rb") as binarie_file:
+        with open(self.path,"rb") as binarie_file:
             pdf_reader = PyPDF2.PdfReader(binarie_file)
             first_page = pdf_reader.pages[0]
             self.contenue_pdf_byte = first_page.extract_text()
             self.contenue_pdf_str = self.contenue_pdf_byte.encode("utf-8")
             
     
-    def if_type_date(self,type) -> bool:
-        if type == "date":
-            return True
-        else:
-            return False
-        
     def f_date(self,date) -> str:
         if date == "None":
             return "None"
@@ -72,38 +72,33 @@ class facture_fonction_commun():
     
     def if_info_incomplete(self):
         key_none = []
-        for key in list(self.facture):
-            if self.facture[key] == None:
+        for key in list(self.dict_pattern_centralle):
+            if self.dict_pattern_centralle[key].out == None:
                 key_none.append(key)
         if key_none:        
             self.message_erreur_info_incomplete ="_".join((self.message_erreur_info_incomplete,f"{key}")) 
-            self.facture["erreur"] = self.message_erreur_info_incomplete
             self.donner_manquante = True
     
-    def print_all_info(self):
-        for key in list(self.facture):
-            print(key,":",self.facture[key])
-        pass
     
     def formater_name_facture(self):
-        path_original = self.facture["path"]
+        path_original = self.path
         extension = os.path.splitext(path_original)[-1]
         repertoir_parent = os.path.dirname(path_original)
         if self.donner_manquante:
-            new_nom_fichier = self.separateur_rename.join([self.provenance,f"{self.facture['erreur']}{extension}"])
+            new_nom_fichier = self.separateur_rename.join([self.provenance,f"{self.quelle_donner_manquante}{extension}"])
         else:
-            new_nom_fichier = self.separateur_rename.join([self.provenance,f"{self.facture['id']}{extension}"])
+            new_nom_fichier = self.separateur_rename.join([self.provenance,f"{self.dict_pattern_centralle['id'].out}{extension}"])
             
         #si message erreur donner manquante
-        if self.if_info_incomplete and not self.test:
-            self.facture["path"] = os.path.join(FOLDER_LOCAL.FACTURE_INFO_MANQUANTE,new_nom_fichier)
-            self.facture["name"] = os.path.basename(self.facture["path"])
+        if self.donner_manquante and not self.if_fichier_test_present:
+            self.path = os.path.join(FOLDER_LOCAL.FACTURE_INFO_MANQUANTE,new_nom_fichier)
+            self.nom = os.path.basename(self.path)
         else:
-            self.facture["path"] = os.path.join(repertoir_parent,new_nom_fichier)
-            self.facture["name"] = os.path.basename(self.facture["path"])
-        os.rename(path_original,self.facture["path"])
-        if self.test:
-            print("new_path :",self.facture["path"])
+            self.path = os.path.join(repertoir_parent,new_nom_fichier)
+            self.nom = os.path.basename(self.path)
+        os.rename(path_original,self.path)
+        if self.if_fichier_test_present:
+            print("new_path :",self.path)
     
     def get_nombre_groupe_pattern_found(self,pattern):
         return len(re.search(pattern,self.contenue_pdf_byte))
@@ -134,7 +129,7 @@ class facture_fonction_commun():
         self.get_contenue_pdf()
         chemin_dossier = FOLDER_LOCAL.DOSSIER_CONTENUE_PDF
         extension = ".txt"
-        nom_fichier = os.path.basename(self.facture["path"]).replace(".pdf","")
+        nom_fichier = os.path.basename(self.path).replace(".pdf","")
         nom_fichier = f"{nom_fichier}{extension}"
         contenue = self.contenue_pdf_byte
         
@@ -142,7 +137,7 @@ class facture_fonction_commun():
         if  os.path.exists(chemins_fichier):
             print("fichier déjat existant")
             return
-        if not self.trouver or self.donner_manquante or self.test:
+        if not self.trouver or self.donner_manquante or self.if_fichier_test_present:
             with open(os.path.join(FOLDER_LOCAL.PROMPT_GPT,nom_fichier),"w",encoding="utf-8") as fichier:
                     fichier.write(f"""voici une facture garde la en memoire et repond uniquement "OK je suis pret a prendre les consigne" n écrire rien d autre
     facture :"{contenue}"
@@ -177,10 +172,7 @@ class facture_fonction_commun():
         pattern_instance.pattern = pattern
         pattern_instance.groupe = groupe
         pattern_instance.type = type
-        
-        if emplacement_sheets == "None":
-            pattern_instance.emplacement_sheets = self.default_ordre_sheets
-            self.default_ordre_sheets +=1
+        pattern_instance.emplacement_sheets = emplacement_sheets
         self.dict_pattern_centralle[nom] = pattern_instance
         
     def set_all_content_to_pdf(self):  
@@ -188,8 +180,10 @@ class facture_fonction_commun():
             instance_pattern = self.dict_pattern_centralle[key]
             sortie = self.get_to_contenu(instance_pattern.pattern,instance_pattern.groupe,instance_pattern.type)
             
-            if self.if_type_date(instance_pattern.type):
+            if instance_pattern.type == "date":
                self.dict_pattern_centralle[key].out = self.f_date(sortie)
+            elif instance_pattern.type == "int":
+                self.dict_pattern_centralle[key].out = sortie.replace(".",",")
             else:
                 self.dict_pattern_centralle[key].out = sortie
             
@@ -197,7 +191,6 @@ class facture_fonction_commun():
         self.trouver = True
         self.set_all_content_to_pdf()
         self.if_info_incomplete()
-        self.print_all_info()
         self.formater_name_facture()
         self.cree_fichier_texte_prompt_document()
         

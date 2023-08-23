@@ -23,6 +23,4 @@ class ModelFacture(facture_fonction_commun):
         
 
 
-# permet de construire la facture plus facilements
-ModelFacture(ModelFacture.get_instance_Test_facture())
  
