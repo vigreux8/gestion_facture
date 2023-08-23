@@ -6,7 +6,7 @@ from fonctions.fonction_models_commun import facture_fonction_commun
 class ModelFacture(facture_fonction_commun):
     def __init__(self,path_facture_amazon_prime) -> None:
         super().__init__(path_facture_amazon_prime)
-        self.provenance = "amazon_produit"
+        self.provenance = "nom_default"
         print(f"instance : {self.provenance} active")
         self.facture["path"] = path_facture_amazon_prime
         self.facture["name"] = os.path.basename(path_facture_amazon_prime)
@@ -14,8 +14,11 @@ class ModelFacture(facture_fonction_commun):
         
         #1
         self.add_pattern(r"ttc","Total à payer (\d+,\d+)",1,"str","C")
+
         self.add_pattern(r"date","Date de la commande (\d{2}\.\d{2}\.\d{4})",1,"str","B")
-        self.add_pattern(r"id","Numéro de la facture ([^\s]+)",1,"str","D")
+
+        self.add_pattern(r"id","Numéro de la facture ([^\s]+)",1,"str","A")
+
 
         
         self.get_contenue_pdf()
