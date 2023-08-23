@@ -3,8 +3,7 @@ from Setting.CONSTANTE import FOLDER_LOCAL
 from fonctions.fonction_models_commun import facture_fonction_commun
 import os
 
-# a faire refactoring pour faciliter la maintenabiliter
-#pouvoir selectionne la case_sheet ou est upload le fichier
+# permettre au fichier google sheet d'être 
 #quand on upload des fichier le programme regarde les dossier inconnue et facture a traiter
 
 
@@ -36,12 +35,6 @@ class tool_widget_constructor(widget_basic):
     
     def get_var_widget_varchar_groupe(self):
         return self.widget_liste_groupe,self.var_tkinter_groupe
-
-
-
-
-    
-    
 
 class tkinter_tools():
     def __init__(self) -> None:
@@ -113,7 +106,9 @@ class tkinter_tools():
         pattern_build.var_tkinter_saisie = self.init_variable_tkinter_pattern("saisir pattern")
         pattern_build.var_tkinter_groupe = self.init_variable_tkinter_pattern(0,"int")
         pattern_build.var_tkinter_type = self.init_variable_tkinter_pattern(type)
-        pattern_build.var_tkinter_emplacement_sheets = self.init_variable_tkinter_pattern(f"B{len(self.dict_pattern_centralle)}")
+        # pattern_build.var_tkinter_emplacement_sheets = self.init_variable_tkinter_pattern(f"B{len(self.dict_pattern_centralle)}")
+        pattern_build.var_tkinter_emplacement_sheets = self.init_variable_tkinter_pattern(f"B")
+        
         return pattern_build
         
     def init_variable_tkinter_pattern(self,info_visible,type="str"):

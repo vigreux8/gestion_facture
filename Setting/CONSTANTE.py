@@ -63,7 +63,11 @@ class KEY_INFOMRATION():
     PROVENANCE = "provenance"
     PERSONNE = "personne"
     REMBOURSER = "rembourser"
-
+    
+class ALPHABET:
+    #flemme j'ai utiliser gpt pour faire la liste au lieux d'utiliser ord Forgive my
+    COLONNE_GOOGLE_SHEETS = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+)
 class MOIS_TRADUCTION():
     MOIS_TRADUCTION_FR_TO_ANGLAIS = {
     "janvier": "january",
