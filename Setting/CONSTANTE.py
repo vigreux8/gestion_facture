@@ -12,8 +12,9 @@ class KEY_FACTURE():
     URL_GOOGLE = 'google_url'
     ID_FOLDER = 'google_folder_id'
     
-class OPTION_SHEET:
+class SHEET_OPTION:
     POSITION_NOM_COLONNE = 1
+    
     
 class OPTION_LOCAL:
     SEPARATEUR = "_"
@@ -45,7 +46,8 @@ class GOOGLE_AUTH():
     
 class FOLDER_GOOGLESHEET():
     SHEET_OPEN = "test script python"
-    FACTURE = "facture_obh_test" 
+    DOCUMENT_SHEET = "OBH_factures" 
+    NAME_FEUILLE = "Facture"
     
     
 class FOLDER_GOOGLEDRIVE():
@@ -77,6 +79,7 @@ class MOIS_TRADUCTION():
     "mai": "may",
     "juin": "june",
     "juillet": "july",
+    "juil." : "jul",
     "août": "august",
     "septembre": "september",
     "octobre": "october",

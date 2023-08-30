@@ -120,7 +120,7 @@ class facture_fonction_commun():
             if group == "None":
                 return pattern_found
             elif type == "str" or "date":
-                return str(pattern_found.group(int(group)).replace(",",""))
+                return str(pattern_found.group(int(group)))
             elif type == "int":
                 return pattern_found.group(int(group)).replace(".",",")
                 

@@ -15,8 +15,8 @@ class ModelFacture(facture_fonction_commun):
         
         #1
         self.add_pattern(r"ttc","Total(\d+,\d{2} )",1,"montant","C")
-        self.add_pattern(r"date","payé le (\d{2} [a-zA-Z]+, \d{4})",1,"date","B")
-        self.add_pattern(r"id","Facture #—([A-Z0-9-]+)",1,"normale","A")
+        self.add_pattern(r"date","Date de la facture —(\w+\.\s\d{2},\s\d{4}|\w+\s\d{1,2},\s\d{4})",1,"date","B")
+        self.add_pattern(r"id","Facture #—([A-Z0-9-]+)",1,"normale","D")
 
 
         

@@ -262,7 +262,6 @@ class grahpique_constructors(tkinter_menu_creators,facture_fonction_commun,):
                 self.widget_pattern_id_unique.var_tkinter_sortie.set("False")
             for key in list(self.dict_pattern_centralle.keys()):
                 pattern_info = self.dict_pattern_centralle[key]
-                pattern_info.var_tkinter_type
                 pattern_info.pattern = pattern_info.var_tkinter_saisie.get().strip()
                 pattern_info.liste_groupe = self.get_len_groupe(pattern_info.pattern)
                 pattern_info = self.actualiser_liste(pattern_info)
@@ -283,7 +282,7 @@ class grahpique_constructors(tkinter_menu_creators,facture_fonction_commun,):
         pattern_info = self.if_set_tkinter_type(pattern_info,"normale")
         pattern_info = self.if_set_tkinter_type(pattern_info,"date")
         pattern_info = self.if_set_tkinter_type(pattern_info,"montant")
-        
+        return pattern_info
 
         
     

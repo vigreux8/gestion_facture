@@ -1,6 +1,6 @@
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
-from Setting.CONSTANTE import GOOGLE_AUTH,FOLDER_GOOGLESHEET,OPTION_SHEET
+from Setting.CONSTANTE import GOOGLE_AUTH,FOLDER_GOOGLESHEET,SHEET_OPTION
 import gspread
 import os
 from Setting.CONSTANTE import *
@@ -184,7 +184,7 @@ class MrDrive:
         drive_facture_traiter.Upload()
     
 class MrSheets():
-    def __init__(self,compte_mail_json=GOOGLE_AUTH.KEY_MAILS_AUTH,file_sheets=FOLDER_GOOGLESHEET.FACTURE,feuille="Feuille1") -> None:
+    def __init__(self,compte_mail_json=GOOGLE_AUTH.KEY_MAILS_AUTH,file_sheets=FOLDER_GOOGLESHEET.DOCUMENT_SHEET,feuille = FOLDER_GOOGLESHEET.NAME_FEUILLE) -> None:
         #self.file = gspread.oauth(credentials_filename=GOOGLE_AUTH.KEY_AUTH_OAUTH,authorized_user_filename=GOOGLE_AUTH.KEY_TOKEN_REFRESH)
         # self.info_associer_col = {
         #     KEY_INFOMRATION.CONTROLLER:"a",
@@ -202,13 +202,13 @@ class MrSheets():
     def get_id_facture_index_col_dict(self,numero_colonne=4,index = False):
         list_google_sheet = []
         if index:
-            for index,value in list(enumerate(self.feuille1.col_values(numero_colonne)))[OPTION_SHEET.POSITION_NOM_COLONNE:]:
+            for index,value in list(enumerate(self.feuille1.col_values(numero_colonne)))[SHEET_OPTION.POSITION_NOM_COLONNE:]:
                 list_google_sheet.append({
                     "id" : value,
                     "index_sheet" : index
                 })
         else:
-            for value in self.feuille1.col_values(numero_colonne)[OPTION_SHEET.POSITION_NOM_COLONNE:]:
+            for value in self.feuille1.col_values(numero_colonne)[SHEET_OPTION.POSITION_NOM_COLONNE:]:
                 list_google_sheet.append(value)
         return list_google_sheet
      
@@ -293,7 +293,7 @@ class MrOrchestre():
                         self.drive.upload_local_to_drive(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_TAMPON,instance.path)
                         dict_drive_file_info = self.drive.get_all_file_drive_folder(FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_TAMPON)
                         google_url = dict_drive_file_info['google_url']
-                        id_facture = instance.id_provenance
+                        id_facture = instance.dict_pattern_centralle["id"].out
                         instance.dict_pattern_centralle["id"].out = '=HYPERLINK("{}"; "{}")'.format(google_url, id_facture)  #crée l'url
                         self.drive.drive_move_file_to_folder(dict_drive_file_info["google_id"],FOLDER_GOOGLEDRIVE.ID_DOSSIER_FACTURE_ARCHIVER)
                         self.sheet.ecrire_apres_dernier_valeur_col(instance)
