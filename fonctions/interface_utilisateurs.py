@@ -105,16 +105,17 @@ class tkinter_tools():
        bouton = tk.Button(self.fenetre,text=texte,command=fonction_declencher)
        bouton.grid(row=v_row,column=v_col)
     
-    def set_variable_tkinter_in_instance_pattern(self,nom_pattern,type = "str") -> all_var_widget_info:
+    def set_variable_tkinter_in_instance_pattern(self,nom_pattern,type = "str" , Emplacement_google_sheets = None) -> all_var_widget_info:
         pattern_build = all_var_widget_info()
         pattern_build.var_tkinter_nom = self.init_variable_tkinter(nom_pattern)
         pattern_build.var_tkinter_sortie = self.init_variable_tkinter("None")
         pattern_build.var_tkinter_saisie = self.init_variable_tkinter("saisir pattern")
         pattern_build.var_tkinter_groupe = self.init_variable_tkinter(0,"int")
         pattern_build.var_tkinter_type = self.init_variable_tkinter(type)
-        # pattern_build.var_tkinter_emplacement_sheets = self.init_variable_tkinter_pattern(f"B{len(self.dict_pattern_centralle)}")
-        pattern_build.var_tkinter_emplacement_sheets = self.init_variable_tkinter(f"{ALPHABET.COLONNE_GOOGLE_SHEETS[len(self.dict_pattern_centralle)]}")
-        
+        if Emplacement_google_sheets:
+            pattern_build.var_tkinter_emplacement_sheets = self.init_variable_tkinter(f"{ALPHABET.COLONNE_GOOGLE_SHEETS[len(self.dict_pattern_centralle)]}")
+        else:
+            pattern_build.var_tkinter_emplacement_sheets = self.init_variable_tkinter(Emplacement_google_sheets)
         return pattern_build
         
     def init_variable_tkinter(self,info_visible,type="str"):
@@ -156,8 +157,8 @@ class tkinter_menu_creators(tkinter_tools):
         self.last_row_element +=1
         
         
-    def tkinter_cree_pattern(self,nom_pattern : str, type = "str",):
-        pattern_build = self.set_widget_pattern(self.set_variable_tkinter_in_instance_pattern(nom_pattern,type))
+    def tkinter_cree_pattern(self,nom_pattern : str, type = "str",emplacement_google_sheet = None):
+        pattern_build = self.set_widget_pattern(self.set_variable_tkinter_in_instance_pattern(nom_pattern,type,emplacement_google_sheet))
         self.dict_pattern_centralle[nom_pattern] = pattern_build
     
     def tkinter_options(self):
@@ -186,12 +187,14 @@ class grahpique_constructors(tkinter_menu_creators,facture_fonction_commun,):
             sortie = self.get_to_contenu(instance_pattern.pattern,instance_pattern.var_tkinter_groupe.get(),instance_pattern.var_tkinter_type.get())
             try:
                 if instance_pattern.var_tkinter_type.get() == "date":
-                    instance_pattern.var_tkinter_sortie.set(self.f_date(sortie)) 
+                    instance_pattern.var_tkinter_sortie.set(self.f_date(sortie.strip())) 
                     return instance_pattern
                 elif  instance_pattern.var_tkinter_type.get() == "int":
                     instance_pattern.var_tkinter_sortie.set(sortie.replace(".",","))
                     return instance_pattern
             except:
+                if instance_pattern.var_tkinter_type.get() == "date" or instance_pattern.var_tkinter_type.get() == "int":
+                    print("la date ne se transforme pas correctement")
                 instance_pattern.var_tkinter_sortie.set(sortie) 
                 return instance_pattern
             else:
@@ -289,9 +292,9 @@ class grahpique_constructors(tkinter_menu_creators,facture_fonction_commun,):
         if self.if_fichier_test_present:
             self.get_contenue_pdf()
             self.tkinter_haut_page()
-            self.tkinter_cree_pattern("id",type="normale")
-            self.tkinter_cree_pattern("date",type="date")
-            self.tkinter_cree_pattern("ttc",type="montant")
+            self.tkinter_cree_pattern("id","normale","D")
+            self.tkinter_cree_pattern("date","date","B")
+            self.tkinter_cree_pattern("ttc","montant","C")
             self.tkinter_options()
             # self.get_tkinter_info_IfKeysPress()
             self.fenetre.mainloop()

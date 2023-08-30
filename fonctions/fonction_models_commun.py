@@ -61,13 +61,14 @@ class facture_fonction_commun():
             try:
                 for mois in list(MOIS_TRADUCTION.MOIS_TRADUCTION_FR_TO_ANGLAIS):
                     if mois in date:
-                        facture_date = facture_date.replace(mois,MOIS_TRADUCTION.MOIS_TRADUCTION_FR_TO_ANGLAIS[mois])
+                        facture_date = date.replace(mois,MOIS_TRADUCTION.MOIS_TRADUCTION_FR_TO_ANGLAIS[mois])
                         break
                 date_obj = parse(facture_date)
                 date_obj = date_obj.strftime('%d/%m/%Y')
                 return date_obj
             except ValueError as error:
                 print("An error occurred:", str(error))
+                return date
 
     
     def if_info_incomplete(self):
@@ -119,7 +120,7 @@ class facture_fonction_commun():
             if group == "None":
                 return pattern_found
             elif type == "str" or "date":
-                return str(pattern_found.group(int(group)))
+                return str(pattern_found.group(int(group)).replace(",",""))
             elif type == "int":
                 return pattern_found.group(int(group)).replace(".",",")
                 
