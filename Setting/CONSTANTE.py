@@ -81,6 +81,7 @@ class MOIS_TRADUCTION():
     "juillet": "july",
     "juil." : "jul",
     "août": "august",
+    "aou" : "AUG",
     "septembre": "september",
     "octobre": "october",
     "novembre": "november",

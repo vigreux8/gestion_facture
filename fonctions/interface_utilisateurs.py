@@ -190,7 +190,7 @@ class grahpique_constructors(tkinter_menu_creators,facture_fonction_commun,):
             sortie = self.get_to_contenu(instance_pattern.pattern,instance_pattern.var_tkinter_groupe.get(),instance_pattern.type_traduit)
             try:
                 if instance_pattern.type_traduit == "date":
-                    instance_pattern.var_tkinter_sortie.set(self.f_date(sortie.strip())) 
+                    instance_pattern.var_tkinter_sortie.set(self.f_date(sortie.strip().lower()))
                     return instance_pattern
                 elif  instance_pattern.type_traduit == "int":
                     instance_pattern.var_tkinter_sortie.set(sortie.replace(".",","))
