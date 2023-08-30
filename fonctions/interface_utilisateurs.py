@@ -21,6 +21,7 @@ class all_var_widget_info(widget_basic):
     def __init__(self) -> None:
         super().__init__()
         self.pattern = None
+        self.type_traduit = None
         self.liste_groupe = [0]
         self.var_tkinter_type :tk.StringVar = None
         self.var_tkinter_groupe :tk.IntVar = None
@@ -112,6 +113,7 @@ class tkinter_tools():
         pattern_build.var_tkinter_saisie = self.init_variable_tkinter("saisir pattern")
         pattern_build.var_tkinter_groupe = self.init_variable_tkinter(0,"int")
         pattern_build.var_tkinter_type = self.init_variable_tkinter(type)
+        pattern_build.type_traduit = self.dict_translate_type[type]
         if Emplacement_google_sheets:
             pattern_build.var_tkinter_emplacement_sheets = self.init_variable_tkinter(f"{ALPHABET.COLONNE_GOOGLE_SHEETS[len(self.dict_pattern_centralle)]}")
         else:
@@ -157,8 +159,9 @@ class tkinter_menu_creators(tkinter_tools):
         self.last_row_element +=1
         
         
-    def tkinter_cree_pattern(self,nom_pattern : str, type = "str",emplacement_google_sheet = None):
+    def tkinter_cree_pattern(self,nom_pattern : str, type = "normale",emplacement_google_sheet = None):
         pattern_build = self.set_widget_pattern(self.set_variable_tkinter_in_instance_pattern(nom_pattern,type,emplacement_google_sheet))
+
         self.dict_pattern_centralle[nom_pattern] = pattern_build
     
     def tkinter_options(self):
@@ -184,16 +187,16 @@ class grahpique_constructors(tkinter_menu_creators,facture_fonction_commun,):
 
     def set_all_content_to_pdf(self,instance_pattern : all_var_widget_info) -> all_var_widget_info:  
         #fonctions sur-ecrite  elle existe aussi sur fonction model communs qui utiliser tout les pattern trouver dans les model de facture
-            sortie = self.get_to_contenu(instance_pattern.pattern,instance_pattern.var_tkinter_groupe.get(),instance_pattern.var_tkinter_type.get())
+            sortie = self.get_to_contenu(instance_pattern.pattern,instance_pattern.var_tkinter_groupe.get(),instance_pattern.type_traduit)
             try:
-                if instance_pattern.var_tkinter_type.get() == "date":
+                if instance_pattern.type_traduit == "date":
                     instance_pattern.var_tkinter_sortie.set(self.f_date(sortie.strip())) 
                     return instance_pattern
-                elif  instance_pattern.var_tkinter_type.get() == "int":
+                elif  instance_pattern.type_traduit == "int":
                     instance_pattern.var_tkinter_sortie.set(sortie.replace(".",","))
                     return instance_pattern
             except:
-                if instance_pattern.var_tkinter_type.get() == "date" or instance_pattern.var_tkinter_type.get() == "int":
+                if instance_pattern.type_traduit == "date" or instance_pattern.type_traduit == "int":
                     print("la date ne se transforme pas correctement")
                 instance_pattern.var_tkinter_sortie.set(sortie) 
                 return instance_pattern
@@ -224,7 +227,7 @@ class grahpique_constructors(tkinter_menu_creators,facture_fonction_commun,):
             nom = pattern_info.var_tkinter_nom.get()
             pattern = pattern_info.var_tkinter_saisie.get()
             groupe = pattern_info.var_tkinter_groupe.get()
-            type = pattern_info.var_tkinter_type.get()
+            type = pattern_info.type_traduit
             emplacement_sheet =  pattern_info.var_tkinter_emplacement_sheets.get()
             rajouts = f'self.add_pattern(r"{nom}","{pattern}",{groupe},"{type}","{emplacement_sheet}")'
             element_rechercher = recherche
@@ -262,6 +265,7 @@ class grahpique_constructors(tkinter_menu_creators,facture_fonction_commun,):
                 self.widget_pattern_id_unique.var_tkinter_sortie.set("False")
             for key in list(self.dict_pattern_centralle.keys()):
                 pattern_info = self.dict_pattern_centralle[key]
+                pattern_info.type_traduit = self.dict_translate_type[pattern_info.var_tkinter_type.get()]
                 pattern_info.pattern = pattern_info.var_tkinter_saisie.get().strip()
                 pattern_info.liste_groupe = self.get_len_groupe(pattern_info.pattern)
                 pattern_info = self.actualiser_liste(pattern_info)
@@ -272,9 +276,9 @@ class grahpique_constructors(tkinter_menu_creators,facture_fonction_commun,):
     
     def if_set_tkinter_type(self,pattern_info : all_var_widget_info,cles : str):
         if cles in list(self.dict_translate_type.keys()) :
-            pattern_info.var_tkinter_type.set(self.dict_translate_type[cles])
+            pattern_info.type_traduit.set(self.dict_translate_type[cles])
         elif cles in list(self.dict_transle_type_inver) : 
-             pattern_info.var_tkinter_type.set[self.dict_transle_type_inver[cles]]
+             pattern_info.type_traduit.set[self.dict_transle_type_inver[cles]]
         return pattern_info
             
         
