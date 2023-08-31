@@ -31,13 +31,13 @@ class facture_fonction_commun():
         self.quelle_donner_manquante :str = ""
         self.provenance = "numero unique"
         
-        
-        
-        self.separateur_rename = OPTION_LOCAL.SEPARATEUR
+    def if_dirname_test_or_inconnue(self):
+        return os.path.dirname(self.path) == FOLDER_LOCAL.FACTURE_TEST or os.path.dirname(self.path) == FOLDER_LOCAL.FACTURE_INCONNUE
+    
     def detect_test(self):
         if not self.path == None:
-            if os.path.dirname(self.path) == FOLDER_LOCAL.FACTURE_TEST:
-                return True
+            if self.if_dirname_test_or_inconnue  :
+                return True           
         else:
             return False
             
@@ -195,18 +195,28 @@ class facture_fonction_commun():
         self.formater_name_facture()
         self.cree_fichier_texte_prompt_document()
         
-    def get_instance_Test_facture(self) -> str: 
+    def get_instance_Test_facture_or_inconnue(self) -> str: 
         '''
         mode : 
             -path : return path
             -instance : retourne la fonction commmun avec le path
         '''
         """retourne la facture present dnas le dossier test"""
-        if len(os.listdir(FOLDER_LOCAL.FACTURE_TEST)) == 1:
+        nb_fichier_test : int = len(os.listdir(FOLDER_LOCAL.FACTURE_TEST))
+        list_fichier_test :list = os.listdir(FOLDER_LOCAL.FACTURE_TEST)
+        nb_fichier_inconnue : int = len(os.listdir(FOLDER_LOCAL.FACTURE_INCONNUE))
+        list_fichier_inconnue : list = os.listdir(FOLDER_LOCAL.FACTURE_INCONNUE)
+        
+        if nb_fichier_test == 1:
             nom_fichier =  os.listdir(FOLDER_LOCAL.FACTURE_TEST)[0]
             path_fichier = os.path.join(FOLDER_LOCAL.FACTURE_TEST,nom_fichier)
             return path_fichier
-        elif len(os.listdir(FOLDER_LOCAL.FACTURE_TEST)) >= 1:
+        elif nb_fichier_test > 1:
             print("le dossier test doit contenir 1 seul fichier ")
         else:
-            print("fichier vide")
+            if nb_fichier_inconnue > 0:
+                print("le fichier vient de dossier inconnue ")
+                
+                return os.path.join(FOLDER_LOCAL.FACTURE_INCONNUE,list_fichier_inconnue[0])
+            else:           
+                print("fichier vide")

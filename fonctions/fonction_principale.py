@@ -161,10 +161,16 @@ class MrDrive:
             key_connecte_google_drive.LocalWebserverAuth()
         elif key_connecte_google_drive.access_token_expired:
             # Les informations d'identification ont expiré, mais le refresh token permet de les renouveler automatiquement
-            key_connecte_google_drive.Refresh()
+            try:
+                key_connecte_google_drive.Refresh()
+                
+            except:
+                os.remove(GOOGLE_AUTH.KEY_TOKEN_REFRESH)
+                key_connecte_google_drive.Refresh()     
         else:
-            # Les informations d'identification sont valides
             key_connecte_google_drive.Authorize()
+            # Les informations d'identification sont valides
+            
 
         # Enregistrez les informations d'identification dans le fichier de token
         key_connecte_google_drive.SaveCredentialsFile(GOOGLE_AUTH.KEY_TOKEN_REFRESH)
@@ -276,7 +282,7 @@ class MrOrchestre():
         list_facture_pas_traiter =  self.local.listdir_path_complet_sans_pycache(FOLDER_LOCAL.FACTURE_PAS_TRAITER)
         list_element_inconnue = list_facture_pas_traiter.copy()
         if os.listdir(FOLDER_LOCAL.FACTURE_INCONNUE):
-           list_facture_pas_traiter.append(*self.local.listdir_path_complet_sans_pycache(FOLDER_LOCAL.FACTURE_INCONNUE))
+           list_facture_pas_traiter.append(self.local.listdir_path_complet_sans_pycache(FOLDER_LOCAL.FACTURE_INCONNUE))
         for path_facture in list_facture_pas_traiter:
             for template_facture in self.local.list_template_factures: 
                 instance =  template_facture(path_facture)

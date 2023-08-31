@@ -114,7 +114,7 @@ class tkinter_tools():
         pattern_build.var_tkinter_groupe = self.init_variable_tkinter(0,"int")
         pattern_build.var_tkinter_type = self.init_variable_tkinter(type)
         pattern_build.type_traduit = self.dict_translate_type[type]
-        if Emplacement_google_sheets:
+        if not Emplacement_google_sheets :
             pattern_build.var_tkinter_emplacement_sheets = self.init_variable_tkinter(f"{ALPHABET.COLONNE_GOOGLE_SHEETS[len(self.dict_pattern_centralle)]}")
         else:
             pattern_build.var_tkinter_emplacement_sheets = self.init_variable_tkinter(Emplacement_google_sheets)
@@ -180,7 +180,7 @@ class grahpique_constructors(tkinter_menu_creators,facture_fonction_commun,):
     '''
     
     def __init__(self) -> None:
-        facture_fonction_commun.__init__(self,self.get_instance_Test_facture())
+        facture_fonction_commun.__init__(self,self.get_instance_Test_facture_or_inconnue())
         tkinter_menu_creators.__init__(self)
         self.contenue_py = None
         self.nom_provenance = None
